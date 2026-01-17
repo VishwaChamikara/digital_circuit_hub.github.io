@@ -71,12 +71,13 @@
 </header>
 
 <div class="container">
+    
     <div id="creator-tools">
-        <h3 style="color:var(--accent); margin-top:0;">Add New Project Video</h3>
+        <h3 style="color:var(--accent); margin-top:0;">🚀 Creator Dashboard</h3>
         <input type="text" id="newTitle" class="inp" placeholder="Project Title">
-        <input type="text" id="newID" class="inp" placeholder="YouTube Video ID (e.g., p8s_IQVnNCM)">
-        <textarea id="newCode" class="inp" style="height:80px" placeholder="Paste Arduino Code Here"></textarea>
-        <button class="btn btn-yt" onclick="addNewVideo()" style="width:100%">Publish to Gallery & Save</button>
+        <input type="text" id="newID" class="inp" placeholder="YouTube Video ID (11 characters)">
+        <textarea id="newCode" class="inp" style="height:80px" placeholder="Arduino Code..."></textarea>
+        <button class="btn btn-yt" onclick="addNewVideo()" style="width:100%">Add & Save to Browser</button>
     </div>
 
     <div class="project-grid" id="mainGrid">
@@ -89,22 +90,20 @@
                     <button class="btn btn-edit creator-btn" onclick="enableEdit('c1')">Edit Code</button>
                     <a href="https://youtu.be/p8s_IQVnNCM" target="_blank" class="btn btn-yt">Watch</a>
                 </div>
-                <pre id="c1" class="code-area" contenteditable="false">// Your default code here...</pre>
+                <pre id="c1" class="code-area" contenteditable="false">// Default Video Code...</pre>
             </div>
         </div>
     </div>
 
     <div style="text-align: center; margin-top: 60px;">
-        <button onclick="creatorLogin()" style="background:none; border:none; color:rgba(255,255,255,0.1); cursor:pointer;">[ CREATOR LOGIN ]</button>
-        <br>
-        <button onclick="clearSaved()" style="background:none; border:none; color:rgba(255,0,0,0.2); cursor:pointer; font-size: 10px; margin-top: 10px;">[ Clear Memory ]</button>
+        <button onclick="creatorLogin()" style="background:none; border:none; color:rgba(255,255,255,0.05); cursor:pointer;">[ CREATOR LOGIN ]</button>
     </div>
 </div>
 
 <footer>&copy; 2026 DIGITAL CIRCUIT HUB</footer>
 
 <script>
-    // 1. BG Animation
+    // Particle BG
     const canvas = document.getElementById('canvas-bg');
     const ctx = canvas.getContext('2d');
     let pts = [];
@@ -123,15 +122,15 @@
     }
     init(); draw();
 
-    // 2. Load Saved Videos on Startup
+    // Load LocalStorage Videos
     window.onload = function() {
-        let saved = JSON.parse(localStorage.getItem('circuitVideos')) || [];
+        let saved = JSON.parse(localStorage.getItem('myProjects')) || [];
         saved.forEach((v, i) => {
             renderVideo(v.title, v.id, v.code, i + 100);
         });
     }
 
-    // 3. Creator Logic
+    // Admin Logic
     function creatorLogin() {
         if(prompt("Password:") === "BRO123") {
             document.getElementById('creator-tools').style.display = 'block';
@@ -144,21 +143,15 @@
         let id = document.getElementById('newID').value;
         let code = document.getElementById('newCode').value;
 
-        if(!title || !id) return alert("Please enter Title and Video ID!");
+        if(!title || !id) return alert("Fill Title and ID!");
 
         // Save to LocalStorage
-        let saved = JSON.parse(localStorage.getItem('circuitVideos')) || [];
+        let saved = JSON.parse(localStorage.getItem('myProjects')) || [];
         saved.push({title, id, code});
-        localStorage.setItem('circuitVideos', JSON.stringify(saved));
+        localStorage.setItem('myProjects', JSON.stringify(saved));
 
-        // Show on screen
         renderVideo(title, id, code, saved.length + 100);
-        
-        // Clear inputs
-        document.getElementById('newTitle').value = "";
-        document.getElementById('newID').value = "";
-        document.getElementById('newCode').value = "";
-        alert("Saved to browser! It will be here next time you open the site.");
+        alert("Saved! Refresh the page to check.");
     }
 
     function renderVideo(title, id, code, count) {
@@ -186,13 +179,6 @@
     function enableEdit(id) {
         let el = document.getElementById(id);
         el.style.display = "block"; el.contentEditable = "true"; el.style.border = "1px solid #fbbf24"; el.focus();
-    }
-
-    function clearSaved() {
-        if(confirm("Delete all saved videos from this browser?")) {
-            localStorage.removeItem('circuitVideos');
-            location.reload();
-        }
     }
 </script>
 </body>

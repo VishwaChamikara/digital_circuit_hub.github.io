@@ -9,64 +9,76 @@
     <style>
         :root { --bg: #050811; --card: rgba(22, 27, 45, 0.9); --accent: #00d2ff; --text: #e2e8f0; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
-        #canvas-bg { position: fixed; top: 0; left: 0; z-index: -1; }
         
-        /* LOGO & HEADER STYLES */
-        header { padding: 50px 20px; text-align: center; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(10px); border-bottom: 2px solid var(--accent); }
-        .site-logo { 
-            width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--accent); 
-            box-shadow: 0 0 20px var(--accent); margin-bottom: 15px; transition: 0.5s;
+        /* 🌌 ANIMATED BACKGROUND */
+        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; width: 100vw; height: 100vh; }
+        
+        header { padding: 40px 20px; text-align: center; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(15px); border-bottom: 2px solid var(--accent); }
+        .site-logo { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); box-shadow: 0 0 20px var(--accent); margin-bottom: 10px; }
+
+        /* 🔍 SEARCH BAR STYLING */
+        .search-container { max-width: 600px; margin: 20px auto; position: relative; }
+        #searchBar { 
+            width: 100%; padding: 15px 20px; border-radius: 30px; border: 1px solid var(--accent);
+            background: rgba(15, 23, 42, 0.8); color: white; font-size: 1rem; outline: none;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); transition: 0.3s;
         }
-        .site-logo:hover { transform: rotate(360deg) scale(1.1); }
-        
-        .container { max-width: 1100px; margin: 40px auto; padding: 20px; }
+        #searchBar:focus { box-shadow: 0 0 25px var(--accent); }
+
+        .container { max-width: 1100px; margin: 20px auto; padding: 20px; }
         .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
-        .project-card { background: var(--card); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); transition: 0.4s; }
+        .project-card { background: var(--card); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); transition: 0.4s; }
+        .project-card:hover { transform: translateY(-10px); border-color: var(--accent); }
         
-        /* CARD LOGO STYLING */
         .card-header { display: flex; align-items: center; padding: 12px 15px; background: rgba(0,0,0,0.3); gap: 10px; }
-        .card-logo { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--accent); }
+        .card-logo { width: 25px; height: 25px; border-radius: 50%; border: 1px solid var(--accent); }
         
         .video-box { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
         .video-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        
         .info { padding: 20px; }
         h2 { color: var(--accent); margin: 0; font-size: 1.1rem; }
-        .code-area { background: #000; color: #00ff00; padding: 15px; border-radius: 12px; font-family: 'Consolas', monospace; display: none; margin-top: 15px; border: 1px solid var(--accent); width: 95%; outline: none; white-space: pre-wrap; }
+        .code-area { background: #000; color: #00ff00; padding: 15px; border-radius: 12px; font-family: monospace; display: none; margin-top: 15px; border: 1px solid var(--accent); white-space: pre-wrap; }
         
-        .btn-group { display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap; }
+        .btn-group { display: flex; gap: 8px; margin-top: 15px; }
         .btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; font-size: 0.8rem; text-align: center; text-decoration: none; }
         .btn-code { background: #334155; }
-        .btn-edit { background: #fbbf24; color: #000; display: none; } 
-        .btn-save { background: #22c55e; display: none; }
         .btn-yt { background: #ff0000; }
-        
+        .creator-btn { display: none; } /* Hidden unless logged in */
+
         #creator-tools { display: none; background: rgba(30, 41, 59, 0.9); padding: 25px; border-radius: 20px; border: 2px dashed var(--accent); margin-bottom: 40px; }
         .inp { width: 95%; padding: 12px; margin-bottom: 10px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 8px; }
     </style>
 </head>
 <body>
-<canvas id="canvas-bg"></canvas>
+
+<canvas id="bg-canvas"></canvas>
+
 <header>
-    <img src="Untitled Design - 1.png" class="site-logo" alt="Logo">
+    <img src="Untitled Design - 1.png" class="site-logo">
     <h1>DIGITAL CIRCUIT HUB</h1>
-    <p>Arduino • ESP32 • IoT • Official Project Hub</p>
+    <div class="search-container">
+        <input type="text" id="searchBar" placeholder="Search projects (e.g. Arduino, LED, Wiring)..." onkeyup="filterProjects()">
+    </div>
 </header>
 
 <div class="container">
     <div id="creator-tools">
-        <h3 style="color:var(--accent); margin-top:0;">🚀 Add New Project</h3>
-        <input type="text" id="newTitle" class="inp" placeholder="Project Title">
-        <input type="text" id="newURL" class="inp" placeholder="Paste YouTube Link or ID">
-        <textarea id="newCode" class="inp" style="height:80px" placeholder="Paste Arduino Code"></textarea>
-        <button class="btn btn-yt" onclick="publish()" style="width:100%">Publish to Cloud</button>
+        <input type="text" id="newTitle" class="inp" placeholder="Title">
+        <input type="text" id="newURL" class="inp" placeholder="YouTube Link">
+        <textarea id="newCode" class="inp" style="height:80px" placeholder="Arduino Code"></textarea>
+        <button class="btn btn-yt" onclick="publish()" style="width:100%">Post Globally</button>
     </div>
+    
     <div class="project-grid" id="mainGrid"></div>
+    
     <div style="text-align: center; margin-top: 50px;">
-        <button onclick="login()" style="background:none; border:none; color:rgba(255,255,255,0.05); cursor:pointer;">[ CREATOR LOGIN ]</button>
+        <button onclick="login()" style="background:none; border:none; color:rgba(255,255,255,0.05); cursor:pointer;">[ ADMIN ]</button>
     </div>
 </div>
 
 <script>
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyBefDwNTP-DO9ApeBydZAlNcVyD5pxfhUQ",
       authDomain: "digitalcircuithub.firebaseapp.com",
@@ -85,6 +97,7 @@
         return (match && match[2].length === 11) ? match[2] : url;
     }
 
+    // LOAD DATA
     db.ref('projects').on('value', (snap) => {
         const grid = document.getElementById('mainGrid');
         grid.innerHTML = ''; 
@@ -92,7 +105,7 @@
             const val = child.val();
             const key = child.key;
             grid.innerHTML += `
-                <div class="project-card">
+                <div class="project-card" data-title="${val.title.toLowerCase()}">
                     <div class="card-header">
                         <img src="Untitled Design - 1.png" class="card-logo">
                         <h2>${val.title}</h2>
@@ -100,40 +113,57 @@
                     <div class="video-box"><iframe src="https://www.youtube.com/embed/${val.ytId}" allowfullscreen></iframe></div>
                     <div class="info">
                         <div class="btn-group">
-                            <button class="btn btn-code" onclick="toggle('${key}')">View Code</button>
-                            <button class="btn btn-edit creator-btn" id="edit-${key}" onclick="enableEdit('${key}')">Edit</button>
-                            <button class="btn btn-save" id="save-${key}" onclick="saveUpdate('${key}')">Save</button>
+                            <button class="btn btn-code" onclick="toggle('${key}')">Code</button>
                             <a href="https://youtu.be/${val.ytId}" target="_blank" class="btn btn-yt">Watch</a>
                             <button class="btn creator-btn" style="background:#444" onclick="del('${key}')">🗑️</button>
                         </div>
-                        <pre id="${key}" class="code-area" contenteditable="false">${val.code}</pre>
+                        <pre id="${key}" class="code-area">${val.code}</pre>
                     </div>
                 </div>`;
         });
         checkLoginStatus();
     });
 
+    // SEARCH FILTER LOGIC
+    function filterProjects() {
+        const query = document.getElementById('searchBar').value.toLowerCase();
+        const cards = document.querySelectorAll('.project-card');
+        cards.forEach(card => {
+            const title = card.getAttribute('data-title');
+            card.style.display = title.includes(query) ? 'block' : 'none';
+        });
+    }
+
+    // BG ANIMATION ENGINE
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let dots = [];
+    function init() {
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        dots = [];
+        for(let i=0; i<80; i++) dots.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*2, vx: Math.random()*0.5-0.25, vy: Math.random()*0.5-0.25});
+    }
+    function animate() {
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        ctx.fillStyle = "rgba(0, 210, 255, 0.3)";
+        dots.forEach(d => {
+            d.x += d.vx; d.y += d.vy;
+            if(d.x<0 || d.x>canvas.width) d.vx *= -1;
+            if(d.y<0 || d.y>canvas.height) d.vy *= -1;
+            ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI*2); ctx.fill();
+        });
+        requestAnimationFrame(animate);
+    }
+    window.addEventListener('resize', init);
+    init(); animate();
+
+    // ADMIN FUNCTIONS
     function publish() {
         const title = document.getElementById('newTitle').value;
         const ytId = getID(document.getElementById('newURL').value);
         const code = document.getElementById('newCode').value;
-        if(title && ytId) {
-            db.ref('projects').push({ title, ytId, code });
-            alert("Published!");
-            document.getElementById('newTitle').value = ''; document.getElementById('newURL').value = ''; document.getElementById('newCode').value = '';
-        }
+        if(title && ytId) db.ref('projects').push({ title, ytId, code });
     }
-
-    function saveUpdate(key) {
-        const newCode = document.getElementById(key).innerText;
-        db.ref('projects').child(key).update({ code: newCode }).then(() => {
-            alert("Updated!");
-            document.getElementById(key).contentEditable = "false";
-            document.getElementById(`save-${key}`).style.display = 'none';
-            document.getElementById(`edit-${key}`).style.display = 'inline-block';
-        });
-    }
-
     function del(key) { if(confirm("Delete?")) db.ref('projects').child(key).remove(); }
     function login() { if(prompt("Pass:") === "BRO123") { sessionStorage.setItem('isAdmin', 'true'); checkLoginStatus(); } }
     function checkLoginStatus() {
@@ -143,13 +173,6 @@
         }
     }
     function toggle(id) { let e = document.getElementById(id); e.style.display = e.style.display === 'block' ? 'none' : 'block'; }
-    function enableEdit(key) {
-        const area = document.getElementById(key);
-        area.style.display = 'block'; area.contentEditable = "true"; area.style.border = "2px solid #fbbf24";
-        document.getElementById(`edit-${key}`).style.display = 'none';
-        document.getElementById(`save-${key}`).style.display = 'inline-block';
-        area.focus();
-    }
 </script>
 </body>
 </html>

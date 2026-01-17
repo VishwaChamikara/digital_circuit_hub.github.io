@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Circuit Hub | Official</title>
+    <title>Digital Circuit Hub | Official Global</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
     <style>
         :root { --bg: #050811; --card: rgba(22, 27, 45, 0.85); --accent: #00d2ff; --text: #e2e8f0; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
@@ -73,27 +77,15 @@
 <div class="container">
     
     <div id="creator-tools">
-        <h3 style="color:var(--accent); margin-top:0;">🚀 Creator Dashboard</h3>
+        <h3 style="color:var(--accent); margin-top:0;">🚀 Global Publisher</h3>
         <input type="text" id="newTitle" class="inp" placeholder="Project Title">
-        <input type="text" id="newID" class="inp" placeholder="YouTube Video ID (11 characters)">
+        <input type="text" id="newID" class="inp" placeholder="YouTube Video ID (11 chars)">
         <textarea id="newCode" class="inp" style="height:80px" placeholder="Arduino Code..."></textarea>
-        <button class="btn btn-yt" onclick="addNewVideo()" style="width:100%">Add & Save to Browser</button>
+        <button class="btn btn-yt" onclick="publishToFirebase()" style="width:100%">Post to Everyone</button>
     </div>
 
     <div class="project-grid" id="mainGrid">
-        <div class="project-card">
-            <div class="video-box"><iframe src="https://www.youtube.com/embed/p8s_IQVnNCM" allowfullscreen></iframe></div>
-            <div class="info">
-                <h2>Arduino R3 VS Nano</h2>
-                <div class="btn-group">
-                    <button class="btn btn-code" onclick="toggleCode('c1')">View Code</button>
-                    <button class="btn btn-edit creator-btn" onclick="enableEdit('c1')">Edit Code</button>
-                    <a href="https://youtu.be/p8s_IQVnNCM" target="_blank" class="btn btn-yt">Watch</a>
-                </div>
-                <pre id="c1" class="code-area" contenteditable="false">// Default Video Code...</pre>
-            </div>
         </div>
-    </div>
 
     <div style="text-align: center; margin-top: 60px;">
         <button onclick="creatorLogin()" style="background:none; border:none; color:rgba(255,255,255,0.05); cursor:pointer;">[ CREATOR LOGIN ]</button>
@@ -103,83 +95,82 @@
 <footer>&copy; 2026 DIGITAL CIRCUIT HUB</footer>
 
 <script>
-    // Particle BG
-    const canvas = document.getElementById('canvas-bg');
-    const ctx = canvas.getContext('2d');
-    let pts = [];
-    function init() {
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        for(let i=0; i<40; i++) pts.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:0.2, vy:0.2});
-    }
-    function draw() {
-        ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = "rgba(0, 210, 255, 0.15)";
-        pts.forEach(p => {
-            p.x += p.vx; p.y += p.vy;
-            if(p.x<0 || p.x>canvas.width) p.vx*=-1; if(p.y<0 || p.y>canvas.height) p.vy*=-1;
-            ctx.beginPath(); ctx.arc(p.x, p.y, 1, 0, Math.PI*2); ctx.fill();
+    // YOUR ACTUAL FIREBASE CONFIG FROM image_c704e8.png
+    const firebaseConfig = {
+      apiKey: "AIzaSyBefDwNTP-DO9ApeBydZAlNcVyD5pxfhUQ",
+      authDomain: "digitalcircuithub.firebaseapp.com",
+      databaseURL: "https://digitalcircuithub-default-rtdb.firebaseio.com",
+      projectId: "digitalcircuithub",
+      storageBucket: "digitalcircuithub.firebasestorage.app",
+      messagingSenderId: "682398409831",
+      appId: "1:682398409831:web:0884fa45b9dec7b54020c2",
+      measurementId: "G-GFPT81HGGZ"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // LIVE SYNC: Load videos for EVERYONE
+    database.ref('projects').on('value', (snapshot) => {
+        const grid = document.getElementById('mainGrid');
+        grid.innerHTML = ''; // Clear old list
+        snapshot.forEach((childSnapshot) => {
+            const data = childSnapshot.val();
+            const key = childSnapshot.key;
+            renderProject(data.title, data.ytId, data.code, key);
         });
-        requestAnimationFrame(draw);
-    }
-    init(); draw();
+    });
 
-    // Load LocalStorage Videos
-    window.onload = function() {
-        let saved = JSON.parse(localStorage.getItem('myProjects')) || [];
-        saved.forEach((v, i) => {
-            renderVideo(v.title, v.id, v.code, i + 100);
+    function publishToFirebase() {
+        const title = document.getElementById('newTitle').value;
+        const ytId = document.getElementById('newID').value;
+        const code = document.getElementById('newCode').value;
+
+        if(!title || !ytId) return alert("Title and Video ID required!");
+
+        database.ref('projects').push({
+            title: title,
+            ytId: ytId,
+            code: code
         });
+
+        document.getElementById('newTitle').value = '';
+        document.getElementById('newID').value = '';
+        document.getElementById('newCode').value = '';
+        alert("Published Successfully! Everyone can see it now.");
     }
 
-    // Admin Logic
-    function creatorLogin() {
-        if(prompt("Password:") === "BRO123") {
-            document.getElementById('creator-tools').style.display = 'block';
-            document.querySelectorAll('.creator-btn').forEach(b => b.style.display = 'block');
-        }
-    }
-
-    function addNewVideo() {
-        let title = document.getElementById('newTitle').value;
-        let id = document.getElementById('newID').value;
-        let code = document.getElementById('newCode').value;
-
-        if(!title || !id) return alert("Fill Title and ID!");
-
-        // Save to LocalStorage
-        let saved = JSON.parse(localStorage.getItem('myProjects')) || [];
-        saved.push({title, id, code});
-        localStorage.setItem('myProjects', JSON.stringify(saved));
-
-        renderVideo(title, id, code, saved.length + 100);
-        alert("Saved! Refresh the page to check.");
-    }
-
-    function renderVideo(title, id, code, count) {
+    function renderProject(title, id, code, key) {
         let html = `
             <div class="project-card">
                 <div class="video-box"><iframe src="https://www.youtube.com/embed/${id}" allowfullscreen></iframe></div>
                 <div class="info">
                     <h2>${title}</h2>
                     <div class="btn-group">
-                        <button class="btn btn-code" onclick="toggleCode('c${count}')">View Code</button>
-                        <button class="btn btn-edit creator-btn" style="display:block" onclick="enableEdit('c${count}')">Edit Code</button>
+                        <button class="btn btn-code" onclick="toggleCode('${key}')">View Code</button>
+                        <button class="btn btn-edit creator-btn" style="display:inline-block" onclick="enableEdit('${key}')">Edit</button>
                         <a href="https://youtu.be/${id}" target="_blank" class="btn btn-yt">Watch</a>
                     </div>
-                    <pre id="c${count}" class="code-area" contenteditable="false">${code}</pre>
+                    <pre id="${key}" class="code-area" contenteditable="false">${code}</pre>
                 </div>
             </div>`;
         document.getElementById('mainGrid').insertAdjacentHTML('beforeend', html);
     }
 
-    function toggleCode(id) {
-        let el = document.getElementById(id);
-        el.style.display = (el.style.display === "block") ? "none" : "block";
-    }
+    // Tools
+    function creatorLogin() { if(prompt("Password:") === "BRO123") document.getElementById('creator-tools').style.display = 'block'; }
+    function toggleCode(id) { let el = document.getElementById(id); el.style.display = (el.style.display === "block") ? "none" : "block"; }
+    function enableEdit(id) { let el = document.getElementById(id); el.style.display = "block"; el.contentEditable = "true"; el.style.border = "1px solid #fbbf24"; el.focus(); }
 
-    function enableEdit(id) {
-        let el = document.getElementById(id);
-        el.style.display = "block"; el.contentEditable = "true"; el.style.border = "1px solid #fbbf24"; el.focus();
-    }
+    // Particle Background
+    const canvas = document.getElementById('canvas-bg');
+    const ctx = canvas.getContext('2d');
+    function init() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', init); init();
+    let pts = Array(40).fill().map(() => ({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:0.2, vy:0.2}));
+    function draw() { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle="rgba(0,210,255,0.15)"; pts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>canvas.width)p.vx*=-1; if(p.y<0||p.y>canvas.height)p.vy*=-1; ctx.beginPath(); ctx.arc(p.x,p.y,1,0,Math.PI*2); ctx.fill(); }); requestAnimationFrame(draw); }
+    draw();
 </script>
 </body>
 </html>

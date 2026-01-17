@@ -3,92 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Digital Circuit Hub | Mobile Pro</title>
+    <title>Digital Circuit Hub | Official</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        :root { --bg: #050811; --card: rgba(22, 27, 45, 0.95); --accent: #00d2ff; --text: #e2e8f0; }
+        :root { --bg: #020617; --accent: #00d2ff; --card-bg: rgba(30, 41, 59, 0.7); }
         
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; overflow-x: hidden; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: #f8fafc; font-family: 'Segoe UI', system-ui, sans-serif; overflow-x: hidden; }
         
-        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; width: 100%; height: 100%; }
+        /* 🌌 FIXED ANIMATION CANVAS */
+        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; width: 100vw; height: 100vh; pointer-events: none; }
 
-        /* 📱 MOBILE OPTIMIZED HEADER */
         header { 
-            padding: 30px 15px; text-align: center; 
-            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(15px); 
-            border-bottom: 2px solid var(--accent);
+            padding: 40px 15px; text-align: center; 
+            background: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), transparent);
+            border-bottom: 1px solid rgba(0, 210, 255, 0.3);
         }
+        
         .site-logo { 
-            width: 80px; height: 80px; border-radius: 50%; 
-            border: 2px solid var(--accent); box-shadow: 0 0 20px var(--accent); 
-            margin-bottom: 10px;
+            width: 90px; height: 90px; border-radius: 50%; border: 2px solid var(--accent); 
+            box-shadow: 0 0 20px var(--accent); margin-bottom: 15px;
         }
-        h1 { font-size: 1.5rem; letter-spacing: 1px; margin: 10px 0; }
 
-        .search-container { width: 90%; max-width: 500px; margin: 15px auto; }
+        .search-container { width: 90%; max-width: 500px; margin: 20px auto; }
         #searchBar { 
-            width: 100%; padding: 12px 20px; border-radius: 25px; border: 1.5px solid var(--accent);
-            background: rgba(10, 15, 30, 0.9); color: white; font-size: 0.95rem; outline: none;
+            width: 100%; padding: 14px 20px; border-radius: 50px; border: 1px solid var(--accent);
+            background: rgba(15, 23, 42, 0.8); color: white; outline: none; transition: 0.3s;
         }
+        #searchBar:focus { box-shadow: 0 0 20px var(--accent); }
 
-        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 15px; }
+        .container { width: 100%; max-width: 1100px; margin: 0 auto; padding: 20px; }
         
-        /* 📱 RESPONSIVE GRID */
+        /* 📱 MOBILE BEAUTY GRID */
         .project-grid { 
-            display: grid; 
-            grid-template-columns: 1fr; /* Single column for phones */
-            gap: 20px; 
+            display: grid; grid-template-columns: 1fr; gap: 25px; 
+            animation: fadeIn 1s ease-in;
         }
         
-        @media (min-width: 768px) {
-            .project-grid { grid-template-columns: repeat(2, 1fr); }
-            h1 { font-size: 2.2rem; }
-            .site-logo { width: 110px; height: 110px; }
-        }
-        
-        @media (min-width: 1024px) {
-            .project-grid { grid-template-columns: repeat(3, 1fr); }
-        }
+        @media (min-width: 768px) { .project-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .project-grid { grid-template-columns: repeat(3, 1fr); } }
 
         .project-card { 
-            background: var(--card); border-radius: 20px; overflow: hidden; 
-            border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.4s;
-            display: flex; flex-direction: column;
+            background: var(--card-bg); backdrop-filter: blur(10px); 
+            border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); 
+            overflow: hidden; transition: 0.3s ease;
         }
-        
-        .card-header { display: flex; align-items: center; padding: 12px; background: rgba(0,0,0,0.4); gap: 10px; }
-        .card-logo { width: 25px; height: 25px; border-radius: 50%; border: 1px solid var(--accent); }
-        h2 { font-size: 1rem; color: var(--accent); margin: 0; flex: 1; }
+        .project-card:hover { transform: translateY(-5px); border-color: var(--accent); }
 
-        .video-box { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
+        .card-header { display: flex; align-items: center; padding: 12px; background: rgba(0,0,0,0.2); gap: 10px; }
+        .card-logo { width: 25px; height: 25px; border-radius: 50%; border: 1px solid var(--accent); }
+        h2 { font-size: 1rem; color: var(--accent); }
+
+        .video-box { position: relative; padding-bottom: 56.25%; height: 0; }
         .video-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-        
+
         .info { padding: 15px; }
-        
-        /* 📱 BETTER MOBILE BUTTONS */
-        .btn-group { display: flex; gap: 8px; margin-top: 15px; }
-        .btn { 
-            flex: 1; padding: 12px 5px; border: none; border-radius: 10px; 
-            font-weight: bold; cursor: pointer; color: white; text-align: center; 
-            text-decoration: none; font-size: 0.8rem; text-transform: uppercase;
-        }
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn { flex: 1; padding: 12px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; text-align: center; text-decoration: none; font-size: 0.8rem; }
         .btn-code { background: #334155; }
-        .btn-yt { background: #ff0000; }
+        .btn-yt { background: #e11d48; }
 
         .code-area { 
-            background: #000; color: #00ff00; padding: 12px; border-radius: 10px; 
-            font-family: monospace; display: none; margin-top: 12px; 
-            border: 1px solid var(--accent); font-size: 0.85rem; overflow-x: auto;
+            background: #000; color: #4ade80; padding: 12px; border-radius: 10px; 
+            font-family: monospace; display: none; margin-top: 10px; 
+            border: 1px solid var(--accent); font-size: 0.8rem; overflow-x: auto;
         }
 
-        /* ADMIN PANEL MOBILE STYLES */
-        #creator-tools { 
-            display: none; background: #1e293b; padding: 20px; 
-            border-radius: 20px; border: 2px dashed var(--accent); margin-bottom: 30px; 
-        }
-        .inp { width: 100%; padding: 12px; margin-bottom: 10px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 8px; font-size: 16px; /* Prevents iOS zoom */ }
+        #creator-tools { display: none; background: #1e293b; padding: 20px; border-radius: 20px; margin-bottom: 30px; border: 2px dashed var(--accent); }
+        .inp { width: 100%; padding: 12px; margin-bottom: 10px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 10px; font-size: 16px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -105,14 +90,14 @@
 
 <div class="container">
     <div id="creator-tools">
-        <input type="text" id="newTitle" class="inp" placeholder="Project Title">
-        <input type="text" id="newURL" class="inp" placeholder="YouTube Link">
+        <input type="text" id="newTitle" class="inp" placeholder="Project Name">
+        <input type="text" id="newURL" class="inp" placeholder="YouTube URL">
         <textarea id="newCode" class="inp" style="height:80px" placeholder="Arduino Code"></textarea>
-        <button class="btn btn-yt" style="width:100%" onclick="publish()">SAVE TO CLOUD</button>
+        <button class="btn btn-yt" style="width:100%" onclick="publish()">SAVE TO FIREBASE</button>
     </div>
     <div class="project-grid" id="mainGrid"></div>
     <div style="text-align: center; padding: 40px 0;">
-        <button onclick="login()" style="background:none; border:none; color:rgba(255,255,255,0.1);">[ ADMIN ]</button>
+        <button onclick="login()" style="background:none; border:none; color:rgba(255,255,255,0.05);">[ ADMIN ]</button>
     </div>
 </div>
 
@@ -160,36 +145,47 @@
         });
     });
 
+    // 🌌 REPAIRED ANIMATION SCRIPT
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        stars = [];
+        for(let i=0; i<50; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2,
+                speed: Math.random() * 0.5 + 0.1
+            });
+        }
+    }
+
+    function draw() {
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        ctx.fillStyle = "rgba(0, 210, 255, 0.4)";
+        stars.forEach(s => {
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.size, 0, Math.PI*2);
+            ctx.fill();
+            s.y -= s.speed;
+            if(s.y < 0) s.y = canvas.height;
+        });
+        requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('load', () => { resize(); draw(); });
+    window.addEventListener('resize', resize);
+
     function filterProjects() {
         const q = document.getElementById('searchBar').value.toLowerCase();
         document.querySelectorAll('.project-card').forEach(c => {
             c.style.display = c.getAttribute('data-title').includes(q) ? 'block' : 'none';
         });
     }
-
-    // BG Animation Engine (Simplified for mobile performance)
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    let dots = [];
-    function init() {
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        dots = [];
-        let count = window.innerWidth < 768 ? 30 : 80; // Fewer dots on mobile
-        for(let i=0; i<count; i++) dots.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: Math.random()*0.4-0.2, vy: Math.random()*0.4-0.2});
-    }
-    function animate() {
-        ctx.clearRect(0,0,canvas.width, canvas.height);
-        ctx.fillStyle = "rgba(0, 210, 255, 0.2)";
-        dots.forEach(d => {
-            d.x += d.vx; d.y += d.vy;
-            if(d.x<0 || d.x>canvas.width) d.vx *= -1;
-            if(d.y<0 || d.y>canvas.height) d.vy *= -1;
-            ctx.beginPath(); ctx.arc(d.x, d.y, 1.5, 0, Math.PI*2); ctx.fill();
-        });
-        requestAnimationFrame(animate);
-    }
-    window.addEventListener('resize', init);
-    init(); animate();
 
     function publish() {
         const title = document.getElementById('newTitle').value;

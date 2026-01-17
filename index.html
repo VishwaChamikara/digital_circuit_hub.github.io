@@ -8,39 +8,61 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         :root { --bg: #050811; --card: rgba(22, 27, 45, 0.9); --accent: #00d2ff; --text: #e2e8f0; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
         #canvas-bg { position: fixed; top: 0; left: 0; z-index: -1; }
-        header { padding: 40px; text-align: center; border-bottom: 2px solid var(--accent); background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); }
-        .profile-img { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); box-shadow: 0 0 15px var(--accent); margin-bottom: 10px; }
-        .container { max-width: 1000px; margin: 30px auto; padding: 20px; }
-        .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
-        .project-card { background: var(--card); border-radius: 15px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.3s; }
+        
+        /* LOGO & HEADER STYLES */
+        header { padding: 50px 20px; text-align: center; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(10px); border-bottom: 2px solid var(--accent); }
+        .site-logo { 
+            width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--accent); 
+            box-shadow: 0 0 20px var(--accent); margin-bottom: 15px; transition: 0.5s;
+        }
+        .site-logo:hover { transform: rotate(360deg) scale(1.1); }
+        
+        .container { max-width: 1100px; margin: 40px auto; padding: 20px; }
+        .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        .project-card { background: var(--card); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); transition: 0.4s; }
+        
+        /* CARD LOGO STYLING */
+        .card-header { display: flex; align-items: center; padding: 12px 15px; background: rgba(0,0,0,0.3); gap: 10px; }
+        .card-logo { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--accent); }
+        
         .video-box { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
         .video-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-        .info { padding: 15px; }
-        .code-area { background: #000; color: #00ff00; padding: 15px; border-radius: 10px; display: none; margin-top: 10px; white-space: pre-wrap; font-family: monospace; border: 1px solid var(--accent); outline: none; }
-        .btn-group { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
-        .btn { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; text-decoration: none; text-align: center; font-size: 0.8rem; min-width: 70px; }
-        #creator-tools { display: none; background: #1e293b; padding: 20px; border-radius: 15px; margin-bottom: 30px; border: 2px dashed var(--accent); }
-        .inp { width: 95%; padding: 10px; margin-bottom: 10px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 5px; }
+        .info { padding: 20px; }
+        h2 { color: var(--accent); margin: 0; font-size: 1.1rem; }
+        .code-area { background: #000; color: #00ff00; padding: 15px; border-radius: 12px; font-family: 'Consolas', monospace; display: none; margin-top: 15px; border: 1px solid var(--accent); width: 95%; outline: none; white-space: pre-wrap; }
+        
+        .btn-group { display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap; }
+        .btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; font-size: 0.8rem; text-align: center; text-decoration: none; }
+        .btn-code { background: #334155; }
+        .btn-edit { background: #fbbf24; color: #000; display: none; } 
+        .btn-save { background: #22c55e; display: none; }
+        .btn-yt { background: #ff0000; }
+        
+        #creator-tools { display: none; background: rgba(30, 41, 59, 0.9); padding: 25px; border-radius: 20px; border: 2px dashed var(--accent); margin-bottom: 40px; }
+        .inp { width: 95%; padding: 12px; margin-bottom: 10px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 8px; }
     </style>
 </head>
 <body>
 <canvas id="canvas-bg"></canvas>
 <header>
-    <img src="Untitled Design - 1.png" class="profile-img">
+    <img src="Untitled Design - 1.png" class="site-logo" alt="Logo">
     <h1>DIGITAL CIRCUIT HUB</h1>
+    <p>Arduino • ESP32 • IoT • Official Project Hub</p>
 </header>
+
 <div class="container">
     <div id="creator-tools">
-        <input type="text" id="newTitle" class="inp" placeholder="Project Name">
+        <h3 style="color:var(--accent); margin-top:0;">🚀 Add New Project</h3>
+        <input type="text" id="newTitle" class="inp" placeholder="Project Title">
         <input type="text" id="newURL" class="inp" placeholder="Paste YouTube Link or ID">
-        <textarea id="newCode" class="inp" style="height:60px" placeholder="Arduino Code"></textarea>
-        <button class="btn" style="background:#ff0000; width:100%" onclick="publish()">Publish Video</button>
+        <textarea id="newCode" class="inp" style="height:80px" placeholder="Paste Arduino Code"></textarea>
+        <button class="btn btn-yt" onclick="publish()" style="width:100%">Publish to Cloud</button>
     </div>
     <div class="project-grid" id="mainGrid"></div>
-    <div style="text-align:center; margin-top:50px">
-        <button onclick="login()" style="background:none; border:none; color:rgba(255,255,255,0.1); cursor:pointer;">Admin</button>
+    <div style="text-align: center; margin-top: 50px;">
+        <button onclick="login()" style="background:none; border:none; color:rgba(255,255,255,0.05); cursor:pointer;">[ CREATOR LOGIN ]</button>
     </div>
 </div>
 
@@ -57,79 +79,77 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    function getYoutubeID(url) {
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-        const match = url.match(regExp);
+    function getID(url) {
+        const reg = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(reg);
         return (match && match[2].length === 11) ? match[2] : url;
     }
 
     db.ref('projects').on('value', (snap) => {
         const grid = document.getElementById('mainGrid');
-        grid.innerHTML = '';
+        grid.innerHTML = ''; 
         snap.forEach((child) => {
             const val = child.val();
             const key = child.key;
             grid.innerHTML += `
                 <div class="project-card">
-                    <div class="video-box">
-                        <iframe src="https://www.youtube.com/embed/${val.ytId}" allowfullscreen></iframe>
+                    <div class="card-header">
+                        <img src="Untitled Design - 1.png" class="card-logo">
+                        <h2>${val.title}</h2>
                     </div>
+                    <div class="video-box"><iframe src="https://www.youtube.com/embed/${val.ytId}" allowfullscreen></iframe></div>
                     <div class="info">
-                        <h3>${val.title}</h3>
                         <div class="btn-group">
-                            <button class="btn" style="background:#334155" onclick="toggle('${key}')">Code</button>
-                            <button class="btn creator-btn" style="background:#fbbf24; color:#000; display:none;" id="edit-btn-${key}" onclick="enableEdit('${key}')">Edit</button>
-                            <button class="btn" style="background:#22c55e; display:none;" id="save-btn-${key}" onclick="saveUpdate('${key}')">Save</button>
-                            <button class="btn" style="background:#ff0000" onclick="window.open('https://youtu.be/${val.ytId}')">Watch</button>
-                            <button class="btn creator-btn" style="background:#444; display:none;" onclick="del('${key}')">🗑️</button>
+                            <button class="btn btn-code" onclick="toggle('${key}')">View Code</button>
+                            <button class="btn btn-edit creator-btn" id="edit-${key}" onclick="enableEdit('${key}')">Edit</button>
+                            <button class="btn btn-save" id="save-${key}" onclick="saveUpdate('${key}')">Save</button>
+                            <a href="https://youtu.be/${val.ytId}" target="_blank" class="btn btn-yt">Watch</a>
+                            <button class="btn creator-btn" style="background:#444" onclick="del('${key}')">🗑️</button>
                         </div>
                         <pre id="${key}" class="code-area" contenteditable="false">${val.code}</pre>
                     </div>
                 </div>`;
         });
-        // Keep tools visible if already logged in
-        if(document.getElementById('creator-tools').style.display === 'block') {
-            document.querySelectorAll('.creator-btn').forEach(b => b.style.display = 'inline-block');
-        }
+        checkLoginStatus();
     });
 
     function publish() {
         const title = document.getElementById('newTitle').value;
-        const cleanID = getYoutubeID(document.getElementById('newURL').value);
+        const ytId = getID(document.getElementById('newURL').value);
         const code = document.getElementById('newCode').value;
-        if(title && cleanID) {
-            db.ref('projects').push({ title, ytId: cleanID, code });
+        if(title && ytId) {
+            db.ref('projects').push({ title, ytId, code });
             alert("Published!");
+            document.getElementById('newTitle').value = ''; document.getElementById('newURL').value = ''; document.getElementById('newCode').value = '';
         }
-    }
-
-    function enableEdit(key) {
-        const codeArea = document.getElementById(key);
-        codeArea.style.display = 'block';
-        codeArea.contentEditable = "true";
-        codeArea.style.border = "2px solid #fbbf24";
-        document.getElementById(`edit-btn-${key}`).style.display = 'none';
-        document.getElementById(`save-btn-${key}`).style.display = 'inline-block';
-        codeArea.focus();
     }
 
     function saveUpdate(key) {
         const newCode = document.getElementById(key).innerText;
         db.ref('projects').child(key).update({ code: newCode }).then(() => {
-            alert("Code Updated!");
+            alert("Updated!");
             document.getElementById(key).contentEditable = "false";
-            document.getElementById(key).style.border = "1px solid var(--accent)";
+            document.getElementById(`save-${key}`).style.display = 'none';
+            document.getElementById(`edit-${key}`).style.display = 'inline-block';
         });
     }
 
-    function del(key) { if(confirm("Delete Project?")) db.ref('projects').child(key).remove(); }
-    function login() { 
-        if(prompt("Pass:") === "BRO123") {
+    function del(key) { if(confirm("Delete?")) db.ref('projects').child(key).remove(); }
+    function login() { if(prompt("Pass:") === "BRO123") { sessionStorage.setItem('isAdmin', 'true'); checkLoginStatus(); } }
+    function checkLoginStatus() {
+        if(sessionStorage.getItem('isAdmin') === 'true') {
             document.getElementById('creator-tools').style.display = 'block';
             document.querySelectorAll('.creator-btn').forEach(b => b.style.display = 'inline-block');
-        } 
+        }
     }
     function toggle(id) { let e = document.getElementById(id); e.style.display = e.style.display === 'block' ? 'none' : 'block'; }
+    function enableEdit(key) {
+        const area = document.getElementById(key);
+        area.style.display = 'block'; area.contentEditable = "true"; area.style.border = "2px solid #fbbf24";
+        document.getElementById(`edit-${key}`).style.display = 'none';
+        document.getElementById(`save-${key}`).style.display = 'inline-block';
+        area.focus();
+    }
 </script>
 </body>
 </html>

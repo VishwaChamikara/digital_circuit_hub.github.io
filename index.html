@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Circuit Hub | Official</title>
+    <title>Digital Circuit Hub | Official Global</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
@@ -15,13 +15,12 @@
         .container { max-width: 1000px; margin: 30px auto; padding: 20px; }
         .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
         .project-card { background: var(--card); border-radius: 15px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.3s; }
-        .project-card:hover { border-color: var(--accent); transform: translateY(-5px); }
         .video-box { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
         .video-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
         .info { padding: 15px; }
-        .code-area { background: #000; color: #00ff00; padding: 15px; border-radius: 10px; display: none; margin-top: 10px; white-space: pre-wrap; font-family: monospace; border: 1px solid var(--accent); }
-        .btn-group { display: flex; gap: 5px; margin-top: 10px; }
-        .btn { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; text-decoration: none; text-align: center; font-size: 0.8rem; }
+        .code-area { background: #000; color: #00ff00; padding: 15px; border-radius: 10px; display: none; margin-top: 10px; white-space: pre-wrap; font-family: monospace; border: 1px solid var(--accent); outline: none; }
+        .btn-group { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
+        .btn { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; text-decoration: none; text-align: center; font-size: 0.8rem; min-width: 70px; }
         #creator-tools { display: none; background: #1e293b; padding: 20px; border-radius: 15px; margin-bottom: 30px; border: 2px dashed var(--accent); }
         .inp { width: 95%; padding: 10px; margin-bottom: 10px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 5px; }
     </style>
@@ -46,7 +45,6 @@
 </div>
 
 <script>
-    // Config from image_c704e8.png
     const firebaseConfig = {
       apiKey: "AIzaSyBefDwNTP-DO9ApeBydZAlNcVyD5pxfhUQ",
       authDomain: "digitalcircuithub.firebaseapp.com",
@@ -59,7 +57,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // The Link Fixer Function
     function getYoutubeID(url) {
         const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
         const match = url.match(regExp);
@@ -81,28 +78,57 @@
                         <h3>${val.title}</h3>
                         <div class="btn-group">
                             <button class="btn" style="background:#334155" onclick="toggle('${key}')">Code</button>
+                            <button class="btn creator-btn" style="background:#fbbf24; color:#000; display:none;" id="edit-btn-${key}" onclick="enableEdit('${key}')">Edit</button>
+                            <button class="btn" style="background:#22c55e; display:none;" id="save-btn-${key}" onclick="saveUpdate('${key}')">Save</button>
                             <button class="btn" style="background:#ff0000" onclick="window.open('https://youtu.be/${val.ytId}')">Watch</button>
-                            <button class="btn" style="background:#444" onclick="del('${key}')">🗑️</button>
+                            <button class="btn creator-btn" style="background:#444; display:none;" onclick="del('${key}')">🗑️</button>
                         </div>
-                        <pre id="${key}" class="code-area">${val.code}</pre>
+                        <pre id="${key}" class="code-area" contenteditable="false">${val.code}</pre>
                     </div>
                 </div>`;
         });
+        // Keep tools visible if already logged in
+        if(document.getElementById('creator-tools').style.display === 'block') {
+            document.querySelectorAll('.creator-btn').forEach(b => b.style.display = 'inline-block');
+        }
     });
 
     function publish() {
         const title = document.getElementById('newTitle').value;
-        const rawID = document.getElementById('newURL').value;
-        const cleanID = getYoutubeID(rawID); // Auto-cleans the link!
+        const cleanID = getYoutubeID(document.getElementById('newURL').value);
         const code = document.getElementById('newCode').value;
         if(title && cleanID) {
             db.ref('projects').push({ title, ytId: cleanID, code });
-            alert("Success!");
+            alert("Published!");
         }
     }
 
-    function del(key) { if(confirm("Delete?")) db.ref('projects').child(key).remove(); }
-    function login() { if(prompt("Pass:") === "BRO123") document.getElementById('creator-tools').style.display = 'block'; }
+    function enableEdit(key) {
+        const codeArea = document.getElementById(key);
+        codeArea.style.display = 'block';
+        codeArea.contentEditable = "true";
+        codeArea.style.border = "2px solid #fbbf24";
+        document.getElementById(`edit-btn-${key}`).style.display = 'none';
+        document.getElementById(`save-btn-${key}`).style.display = 'inline-block';
+        codeArea.focus();
+    }
+
+    function saveUpdate(key) {
+        const newCode = document.getElementById(key).innerText;
+        db.ref('projects').child(key).update({ code: newCode }).then(() => {
+            alert("Code Updated!");
+            document.getElementById(key).contentEditable = "false";
+            document.getElementById(key).style.border = "1px solid var(--accent)";
+        });
+    }
+
+    function del(key) { if(confirm("Delete Project?")) db.ref('projects').child(key).remove(); }
+    function login() { 
+        if(prompt("Pass:") === "BRO123") {
+            document.getElementById('creator-tools').style.display = 'block';
+            document.querySelectorAll('.creator-btn').forEach(b => b.style.display = 'inline-block');
+        } 
+    }
     function toggle(id) { let e = document.getElementById(id); e.style.display = e.style.display === 'block' ? 'none' : 'block'; }
 </script>
 </body>

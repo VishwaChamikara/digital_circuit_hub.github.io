@@ -1,0 +1,173 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Circuit Hub | Official</title>
+    <style>
+        :root { --bg: #050811; --card: rgba(22, 27, 45, 0.85); --accent: #00d2ff; --text: #e2e8f0; }
+        
+        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
+        #canvas-bg { position: fixed; top: 0; left: 0; z-index: -1; }
+
+        header { 
+            padding: 60px 20px; text-align: center; 
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        .profile-img {
+            width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--accent);
+            box-shadow: 0 0 20px var(--accent); animation: pulse-glow 3s infinite alternate;
+            margin-bottom: 15px; object-fit: cover;
+        }
+
+        @keyframes pulse-glow { from { box-shadow: 0 0 10px var(--accent); transform: scale(1); } to { box-shadow: 0 0 35px var(--accent); transform: scale(1.05); } }
+
+        .container { max-width: 1100px; margin: 40px auto; padding: 20px; }
+        .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        
+        .project-card { 
+            background: var(--card); border-radius: 20px; overflow: hidden; 
+            border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); transition: 0.4s;
+        }
+        
+        .project-card:hover { transform: translateY(-10px); border-color: var(--accent); }
+        .video-box { position: relative; padding-bottom: 56.25%; height: 0; }
+        .video-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+
+        .info { padding: 20px; }
+        h2 { color: var(--accent); margin: 0 0 10px 0; font-size: 1.3rem; }
+
+        .code-area { 
+            background: #000; color: #00ff00; padding: 15px; border-radius: 12px; 
+            font-family: 'Consolas', monospace; display: none; margin-top: 15px;
+            border: 1px solid var(--accent); width: 95%; min-height: 80px;
+            outline: none; white-space: pre; overflow-x: auto;
+        }
+
+        .btn-group { display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap; }
+        .btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; color: white; font-size: 0.9rem; }
+        .btn-code { background: #334155; }
+        .btn-edit { background: #fbbf24; color: #000; display: none; } 
+        .btn-yt { background: #ff0000; }
+
+        /* Admin/Add Video Form */
+        #creator-tools { 
+            display: none; background: rgba(30, 41, 59, 0.9); padding: 25px; 
+            border-radius: 20px; border: 2px dashed var(--accent); margin-bottom: 40px; 
+        }
+        .inp { width: 95%; padding: 12px; margin-bottom: 10px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 8px; }
+
+        footer { text-align: center; padding: 50px; opacity: 0.3; }
+    </style>
+</head>
+<body>
+
+<canvas id="canvas-bg"></canvas>
+
+<header>
+    <img src="profile.png" class="profile-img" alt="Digital Circuit Hub">
+    <h1>DIGITAL CIRCUIT HUB</h1>
+    <p>Arduino • ESP32 • IoT • Official Site</p>
+</header>
+
+<div class="container">
+    
+    <div id="creator-tools">
+        <h3 style="color:var(--accent); margin-top:0;">Add New Project Video</h3>
+        <input type="text" id="newTitle" class="inp" placeholder="Project Title">
+        <input type="text" id="newID" class="inp" placeholder="YouTube Video ID (e.g., p8s_IQVnNCM)">
+        <textarea id="newCode" class="inp" style="height:80px" placeholder="Paste Arduino Code Here"></textarea>
+        <button class="btn btn-yt" onclick="addNewVideo()" style="width:100%">Publish to Gallery</button>
+    </div>
+
+    <div class="project-grid" id="mainGrid">
+        <div class="project-card">
+            <div class="video-box"><iframe src="https://www.youtube.com/embed/p8s_IQVnNCM" allowfullscreen></iframe></div>
+            <div class="info">
+                <h2>Arduino R3 VS Nano</h2>
+                <div class="btn-group">
+                    <button class="btn btn-code" onclick="toggleCode('c1')">View Code</button>
+                    <button class="btn btn-edit creator-btn" onclick="enableEdit('c1')">Edit Code</button>
+                    <a href="https://youtu.be/p8s_IQVnNCM" target="_blank" class="btn btn-yt">Watch</a>
+                </div>
+                <pre id="c1" class="code-area" contenteditable="false">// Specs comparison here...</pre>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 60px;">
+        <button onclick="creatorLogin()" style="background:none; border:none; color:rgba(255,255,255,0.1); cursor:pointer;">[ CREATOR LOGIN ]</button>
+    </div>
+</div>
+
+<footer>&copy; 2026 DIGITAL CIRCUIT HUB</footer>
+
+<script>
+    // Particle Background
+    const canvas = document.getElementById('canvas-bg');
+    const ctx = canvas.getContext('2d');
+    let pts = [];
+    function init() {
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        for(let i=0; i<50; i++) pts.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:0.3, vy:0.3});
+    }
+    function draw() {
+        ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = "rgba(0, 210, 255, 0.2)";
+        pts.forEach(p => {
+            p.x += p.vx; p.y += p.vy;
+            if(p.x<0 || p.x>canvas.width) p.vx*=-1; if(p.y<0 || p.y>canvas.height) p.vy*=-1;
+            ctx.beginPath(); ctx.arc(p.x, p.y, 1, 0, Math.PI*2); ctx.fill();
+        });
+        requestAnimationFrame(draw);
+    }
+    window.addEventListener('resize', init); init(); draw();
+
+    // Creator Tools Logic
+    function creatorLogin() {
+        if(prompt("Enter Creator Password:") === "BRO123") {
+            document.getElementById('creator-tools').style.display = 'block';
+            document.querySelectorAll('.creator-btn').forEach(b => b.style.display = 'block');
+            alert("Creator Mode Active!");
+        }
+    }
+
+    function addNewVideo() {
+        let title = document.getElementById('newTitle').value;
+        let id = document.getElementById('newID').value;
+        let code = document.getElementById('newCode').value;
+        let count = document.querySelectorAll('.project-card').length + 1;
+
+        let html = `
+            <div class="project-card">
+                <div class="video-box"><iframe src="https://www.youtube.com/embed/${id}" allowfullscreen></iframe></div>
+                <div class="info">
+                    <h2>${title}</h2>
+                    <div class="btn-group">
+                        <button class="btn btn-code" onclick="toggleCode('c${count}')">View Code</button>
+                        <button class="btn btn-edit creator-btn" style="display:block" onclick="enableEdit('c${count}')">Edit Code</button>
+                        <a href="https://youtu.be/${id}" target="_blank" class="btn btn-yt">Watch</a>
+                    </div>
+                    <pre id="c${count}" class="code-area" contenteditable="false">${code}</pre>
+                </div>
+            </div>`;
+        document.getElementById('mainGrid').insertAdjacentHTML('beforeend', html);
+        alert("Video added to screen! Remember to update your index.html file to save it forever.");
+    }
+
+    function toggleCode(id) {
+        let el = document.getElementById(id);
+        el.style.display = (el.style.display === "block") ? "none" : "block";
+    }
+
+    function enableEdit(id) {
+        let el = document.getElementById(id);
+        el.style.display = "block";
+        el.contentEditable = "true";
+        el.style.border = "2px solid #fbbf24";
+        el.focus();
+    }
+</script>
+</body>
+</html>

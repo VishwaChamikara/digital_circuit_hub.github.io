@@ -3,55 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Circuit Hub | Official Global</title>
+    <title>Digital Circuit Hub | Official</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        :root { --bg: #050811; --card: rgba(22, 27, 45, 0.85); --accent: #00d2ff; --text: #e2e8f0; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
+        :root { --bg: #050811; --card: rgba(22, 27, 45, 0.9); --accent: #00d2ff; --text: #e2e8f0; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; }
         #canvas-bg { position: fixed; top: 0; left: 0; z-index: -1; }
-        header { padding: 60px 20px; text-align: center; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(10px); border-bottom: 2px solid var(--accent); }
-        .profile-img { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--accent); box-shadow: 0 0 20px var(--accent); animation: pulse-glow 3s infinite alternate; margin-bottom: 15px; object-fit: cover; }
-        @keyframes pulse-glow { from { box-shadow: 0 0 10px var(--accent); transform: scale(1); } to { box-shadow: 0 0 35px var(--accent); transform: scale(1.05); } }
-        .container { max-width: 1100px; margin: 40px auto; padding: 20px; }
-        .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
-        .project-card { background: var(--card); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); transition: 0.4s; }
-        .video-box { position: relative; padding-bottom: 56.25%; height: 0; }
+        header { padding: 40px; text-align: center; border-bottom: 2px solid var(--accent); background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); }
+        .profile-img { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); box-shadow: 0 0 15px var(--accent); margin-bottom: 10px; }
+        .container { max-width: 1000px; margin: 30px auto; padding: 20px; }
+        .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .project-card { background: var(--card); border-radius: 15px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.3s; }
+        .project-card:hover { border-color: var(--accent); transform: translateY(-5px); }
+        .video-box { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
         .video-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-        .info { padding: 20px; }
-        h2 { color: var(--accent); margin: 0 0 10px 0; font-size: 1.3rem; }
-        .code-area { background: #000; color: #00ff00; padding: 15px; border-radius: 12px; font-family: 'Consolas', monospace; display: none; margin-top: 15px; border: 1px solid var(--accent); width: 95%; min-height: 80px; outline: none; white-space: pre; overflow-x: auto; }
-        .btn-group { display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap; }
-        .btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; color: white; font-size: 0.9rem; }
-        .btn-code { background: #334155; } .btn-edit { background: #fbbf24; color: #000; display: none; } .btn-yt { background: #ff0000; }
-        #creator-tools { display: none; background: rgba(30, 41, 59, 0.9); padding: 25px; border-radius: 20px; border: 2px dashed var(--accent); margin-bottom: 40px; }
-        .inp { width: 95%; padding: 12px; margin-bottom: 10px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 8px; }
-        footer { text-align: center; padding: 50px; opacity: 0.3; }
+        .info { padding: 15px; }
+        .code-area { background: #000; color: #00ff00; padding: 15px; border-radius: 10px; display: none; margin-top: 10px; white-space: pre-wrap; font-family: monospace; border: 1px solid var(--accent); }
+        .btn-group { display: flex; gap: 5px; margin-top: 10px; }
+        .btn { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; text-decoration: none; text-align: center; font-size: 0.8rem; }
+        #creator-tools { display: none; background: #1e293b; padding: 20px; border-radius: 15px; margin-bottom: 30px; border: 2px dashed var(--accent); }
+        .inp { width: 95%; padding: 10px; margin-bottom: 10px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 5px; }
     </style>
 </head>
 <body>
 <canvas id="canvas-bg"></canvas>
 <header>
-    <img src="Untitled Design - 1.png" class="profile-img" alt="Digital Circuit Hub">
+    <img src="Untitled Design - 1.png" class="profile-img">
     <h1>DIGITAL CIRCUIT HUB</h1>
-    <p>Arduino • ESP32 • IoT • Official Site</p>
 </header>
 <div class="container">
     <div id="creator-tools">
-        <h3 style="color:var(--accent); margin-top:0;">🚀 Global Project Publisher</h3>
-        <input type="text" id="newTitle" class="inp" placeholder="Project Title">
-        <input type="text" id="newID" class="inp" placeholder="YouTube Video ID (e.g., p8s_IQVnNCM)">
-        <textarea id="newCode" class="inp" style="height:80px" placeholder="Paste Arduino Code Here"></textarea>
-        <button class="btn btn-yt" onclick="publishToFirebase()" style="width:100%">Post to Everyone</button>
+        <input type="text" id="newTitle" class="inp" placeholder="Project Name">
+        <input type="text" id="newURL" class="inp" placeholder="Paste YouTube Link or ID">
+        <textarea id="newCode" class="inp" style="height:60px" placeholder="Arduino Code"></textarea>
+        <button class="btn" style="background:#ff0000; width:100%" onclick="publish()">Publish Video</button>
     </div>
     <div class="project-grid" id="mainGrid"></div>
-    <div style="text-align: center; margin-top: 60px;">
-        <button onclick="creatorLogin()" style="background:none; border:none; color:rgba(255,255,255,0.05); cursor:pointer;">[ CREATOR LOGIN ]</button>
+    <div style="text-align:center; margin-top:50px">
+        <button onclick="login()" style="background:none; border:none; color:rgba(255,255,255,0.1); cursor:pointer;">Admin</button>
     </div>
 </div>
-<footer>&copy; 2026 DIGITAL CIRCUIT HUB</footer>
+
 <script>
-    // Your verified Firebase Config
+    // Config from image_c704e8.png
     const firebaseConfig = {
       apiKey: "AIzaSyBefDwNTP-DO9ApeBydZAlNcVyD5pxfhUQ",
       authDomain: "digitalcircuithub.firebaseapp.com",
@@ -59,69 +54,56 @@
       projectId: "digitalcircuithub",
       storageBucket: "digitalcircuithub.firebasestorage.app",
       messagingSenderId: "682398409831",
-      appId: "1:682398409831:web:0884fa45b9dec7b54020c2",
-      measurementId: "G-GFPT81HGGZ"
+      appId: "1:682398409831:web:0884fa45b9dec7b54020c2"
     };
-
     firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    const db = firebase.database();
 
-    // Pulling data from cloud
-    database.ref('projects').on('value', (snapshot) => {
+    // The Link Fixer Function
+    function getYoutubeID(url) {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : url;
+    }
+
+    db.ref('projects').on('value', (snap) => {
         const grid = document.getElementById('mainGrid');
-        grid.innerHTML = ''; 
-        snapshot.forEach((childSnapshot) => {
-            const data = childSnapshot.val();
-            const key = childSnapshot.key;
-            // FIX: This force-injects /embed/ to fix thumbnails
-            const embedUrl = `https://www.youtube.com/embed/${data.ytId}`;
+        grid.innerHTML = '';
+        snap.forEach((child) => {
+            const val = child.val();
+            const key = child.key;
             grid.innerHTML += `
                 <div class="project-card">
-                    <div class="video-box"><iframe src="${embedUrl}" allowfullscreen></iframe></div>
+                    <div class="video-box">
+                        <iframe src="https://www.youtube.com/embed/${val.ytId}" allowfullscreen></iframe>
+                    </div>
                     <div class="info">
-                        <h2>${data.title}</h2>
+                        <h3>${val.title}</h3>
                         <div class="btn-group">
-                            <button class="btn btn-code" onclick="toggleCode('${key}')">View Code</button>
-                            <button class="btn btn-edit creator-btn" style="display:inline-block" onclick="enableEdit('${key}')">Edit</button>
-                            <a href="https://youtu.be/${data.ytId}" target="_blank" class="btn btn-yt">Watch</a>
-                            <button class="btn" style="background:#555" onclick="deleteProject('${key}')">Delete</button>
+                            <button class="btn" style="background:#334155" onclick="toggle('${key}')">Code</button>
+                            <button class="btn" style="background:#ff0000" onclick="window.open('https://youtu.be/${val.ytId}')">Watch</button>
+                            <button class="btn" style="background:#444" onclick="del('${key}')">🗑️</button>
                         </div>
-                        <pre id="${key}" class="code-area">${data.code}</pre>
+                        <pre id="${key}" class="code-area">${val.code}</pre>
                     </div>
                 </div>`;
         });
     });
 
-    function publishToFirebase() {
+    function publish() {
         const title = document.getElementById('newTitle').value;
-        const ytId = document.getElementById('newID').value;
+        const rawID = document.getElementById('newURL').value;
+        const cleanID = getYoutubeID(rawID); // Auto-cleans the link!
         const code = document.getElementById('newCode').value;
-        if(title && ytId) {
-            database.ref('projects').push({ title, ytId, code });
-            alert("Published Successfully!");
-            document.getElementById('newTitle').value = '';
-            document.getElementById('newID').value = '';
-            document.getElementById('newCode').value = '';
+        if(title && cleanID) {
+            db.ref('projects').push({ title, ytId: cleanID, code });
+            alert("Success!");
         }
     }
 
-    function deleteProject(key) {
-        if(confirm("Remove this project for everyone?")) {
-            database.ref('projects').child(key).remove();
-        }
-    }
-
-    function creatorLogin() { if(prompt("Password:") === "BRO123") document.getElementById('creator-tools').style.display = 'block'; }
-    function toggleCode(id) { let el = document.getElementById(id); el.style.display = (el.style.display === "block") ? "none" : "block"; }
-    function enableEdit(id) { let el = document.getElementById(id); el.style.display = "block"; el.contentEditable = "true"; el.style.border = "1px solid #fbbf24"; el.focus(); }
-
-    const canvas = document.getElementById('canvas-bg');
-    const ctx = canvas.getContext('2d');
-    function init() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.addEventListener('resize', init); init();
-    let pts = Array(40).fill().map(() => ({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:0.2, vy:0.2}));
-    function draw() { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle="rgba(0,210,255,0.15)"; pts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>canvas.width)p.vx*=-1; if(p.y<0||p.y>canvas.height)p.vy*=-1; ctx.beginPath(); ctx.arc(p.x,p.y,1,0,Math.PI*2); ctx.fill(); }); requestAnimationFrame(draw); }
-    draw();
+    function del(key) { if(confirm("Delete?")) db.ref('projects').child(key).remove(); }
+    function login() { if(prompt("Pass:") === "BRO123") document.getElementById('creator-tools').style.display = 'block'; }
+    function toggle(id) { let e = document.getElementById(id); e.style.display = e.style.display === 'block' ? 'none' : 'block'; }
 </script>
 </body>
 </html>

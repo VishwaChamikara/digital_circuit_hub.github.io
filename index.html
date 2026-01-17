@@ -2,85 +2,93 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Circuit Hub | Official Global</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Digital Circuit Hub | Mobile Pro</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        :root { --bg: #050811; --card: rgba(22, 27, 45, 0.9); --accent: #00d2ff; --text: #e2e8f0; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
+        :root { --bg: #050811; --card: rgba(22, 27, 45, 0.95); --accent: #00d2ff; --text: #e2e8f0; }
         
-        /* 🌌 MULTI-LAYER ANIMATION BG */
-        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; width: 100vw; height: 100vh; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; overflow-x: hidden; }
         
+        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; width: 100%; height: 100%; }
+
+        /* 📱 MOBILE OPTIMIZED HEADER */
         header { 
-            padding: 50px 20px; text-align: center; 
-            background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(15px); 
-            border-bottom: 3px solid var(--accent);
-            animation: slideDown 1s ease-out;
+            padding: 30px 15px; text-align: center; 
+            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(15px); 
+            border-bottom: 2px solid var(--accent);
         }
-
         .site-logo { 
-            width: 110px; height: 110px; border-radius: 50%; 
-            border: 3px solid var(--accent); box-shadow: 0 0 25px var(--accent); 
-            margin-bottom: 15px; transition: 0.5s; cursor: pointer;
+            width: 80px; height: 80px; border-radius: 50%; 
+            border: 2px solid var(--accent); box-shadow: 0 0 20px var(--accent); 
+            margin-bottom: 10px;
         }
-        .site-logo:hover { transform: rotate(360deg) scale(1.1); box-shadow: 0 0 45px var(--accent); }
+        h1 { font-size: 1.5rem; letter-spacing: 1px; margin: 10px 0; }
 
-        .search-container { max-width: 600px; margin: 25px auto; animation: fadeIn 2s; }
+        .search-container { width: 90%; max-width: 500px; margin: 15px auto; }
         #searchBar { 
-            width: 100%; padding: 15px 25px; border-radius: 30px; border: 2px solid var(--accent);
-            background: rgba(15, 23, 42, 0.9); color: white; font-size: 1rem; outline: none;
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3); transition: 0.4s;
+            width: 100%; padding: 12px 20px; border-radius: 25px; border: 1.5px solid var(--accent);
+            background: rgba(10, 15, 30, 0.9); color: white; font-size: 0.95rem; outline: none;
         }
-        #searchBar:focus { transform: scale(1.02); box-shadow: 0 0 30px var(--accent); }
 
-        .container { max-width: 1200px; margin: 20px auto; padding: 20px; }
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 15px; }
         
-        .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 35px; }
-        
-        /* ✨ CARD ANIMATIONS */
-        .project-card { 
-            background: var(--card); border-radius: 25px; overflow: hidden; 
-            border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); 
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            animation: cardPop 0.6s ease-out forwards;
+        /* 📱 RESPONSIVE GRID */
+        .project-grid { 
+            display: grid; 
+            grid-template-columns: 1fr; /* Single column for phones */
+            gap: 20px; 
         }
-        .project-card:hover { transform: translateY(-15px); border-color: var(--accent); box-shadow: 0 10px 40px rgba(0, 210, 255, 0.3); }
         
-        .card-header { display: flex; align-items: center; padding: 15px; background: rgba(0,0,0,0.4); gap: 12px; }
-        .card-logo { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--accent); }
+        @media (min-width: 768px) {
+            .project-grid { grid-template-columns: repeat(2, 1fr); }
+            h1 { font-size: 2.2rem; }
+            .site-logo { width: 110px; height: 110px; }
+        }
         
+        @media (min-width: 1024px) {
+            .project-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .project-card { 
+            background: var(--card); border-radius: 20px; overflow: hidden; 
+            border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.4s;
+            display: flex; flex-direction: column;
+        }
+        
+        .card-header { display: flex; align-items: center; padding: 12px; background: rgba(0,0,0,0.4); gap: 10px; }
+        .card-logo { width: 25px; height: 25px; border-radius: 50%; border: 1px solid var(--accent); }
+        h2 { font-size: 1rem; color: var(--accent); margin: 0; flex: 1; }
+
         .video-box { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
         .video-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
         
-        .info { padding: 25px; }
-        h2 { color: var(--accent); margin: 0; font-size: 1.2rem; font-weight: 600; }
+        .info { padding: 15px; }
         
-        .code-area { 
-            background: #000; color: #00ff00; padding: 15px; border-radius: 12px; 
-            font-family: 'Consolas', monospace; display: none; margin-top: 15px; 
-            border: 1px solid var(--accent); white-space: pre-wrap; animation: fadeIn 0.5s;
+        /* 📱 BETTER MOBILE BUTTONS */
+        .btn-group { display: flex; gap: 8px; margin-top: 15px; }
+        .btn { 
+            flex: 1; padding: 12px 5px; border: none; border-radius: 10px; 
+            font-weight: bold; cursor: pointer; color: white; text-align: center; 
+            text-decoration: none; font-size: 0.8rem; text-transform: uppercase;
         }
-        
-        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
-        .btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; text-decoration: none; text-align: center; font-size: 0.85rem; }
         .btn-code { background: #334155; }
         .btn-yt { background: #ff0000; }
-        .btn-yt:hover { background: #cc0000; transform: scale(1.05); }
-        
-        .creator-btn { display: none; } /* Hidden for visitors */
 
-        #creator-tools { 
-            display: none; background: rgba(30, 41, 59, 0.95); padding: 30px; 
-            border-radius: 25px; border: 2px dashed var(--accent); margin-bottom: 50px;
-            animation: slideDown 0.5s;
+        .code-area { 
+            background: #000; color: #00ff00; padding: 12px; border-radius: 10px; 
+            font-family: monospace; display: none; margin-top: 12px; 
+            border: 1px solid var(--accent); font-size: 0.85rem; overflow-x: auto;
         }
-        .inp { width: 96%; padding: 14px; margin-bottom: 12px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 10px; }
 
-        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes cardPop { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        /* ADMIN PANEL MOBILE STYLES */
+        #creator-tools { 
+            display: none; background: #1e293b; padding: 20px; 
+            border-radius: 20px; border: 2px dashed var(--accent); margin-bottom: 30px; 
+        }
+        .inp { width: 100%; padding: 12px; margin-bottom: 10px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 8px; font-size: 16px; /* Prevents iOS zoom */ }
     </style>
 </head>
 <body>
@@ -88,26 +96,23 @@
 <canvas id="bg-canvas"></canvas>
 
 <header>
-    <img src="Untitled Design - 1.png" class="site-logo" alt="Digital Circuit Hub Logo">
+    <img src="Untitled Design - 1.png" class="site-logo">
     <h1>DIGITAL CIRCUIT HUB</h1>
     <div class="search-container">
-        <input type="text" id="searchBar" placeholder="Search projects (Arduino, Nano, LED)..." onkeyup="filterProjects()">
+        <input type="text" id="searchBar" placeholder="Search projects..." onkeyup="filterProjects()">
     </div>
 </header>
 
 <div class="container">
     <div id="creator-tools">
-        <h3 style="color:var(--accent); margin-top:0;">🚀 Global Content Publisher</h3>
-        <input type="text" id="newTitle" class="inp" placeholder="Project Name">
-        <input type="text" id="newURL" class="inp" placeholder="YouTube URL or Video ID">
-        <textarea id="newCode" class="inp" style="height:100px" placeholder="Paste Arduino Code Here"></textarea>
-        <button class="btn btn-yt" onclick="publish()" style="width:100%">POST PROJECT TO CLOUD</button>
+        <input type="text" id="newTitle" class="inp" placeholder="Project Title">
+        <input type="text" id="newURL" class="inp" placeholder="YouTube Link">
+        <textarea id="newCode" class="inp" style="height:80px" placeholder="Arduino Code"></textarea>
+        <button class="btn btn-yt" style="width:100%" onclick="publish()">SAVE TO CLOUD</button>
     </div>
-    
     <div class="project-grid" id="mainGrid"></div>
-    
-    <div style="text-align: center; margin-top: 80px;">
-        <button onclick="login()" style="background:none; border:none; color:rgba(255,255,255,0.05); cursor:pointer;">[ ADMIN LOGIN ]</button>
+    <div style="text-align: center; padding: 40px 0;">
+        <button onclick="login()" style="background:none; border:none; color:rgba(255,255,255,0.1);">[ ADMIN ]</button>
     </div>
 </div>
 
@@ -131,7 +136,6 @@
         return (match && match[2].length === 11) ? match[2] : url;
     }
 
-    // LOAD DATA LIVE
     db.ref('projects').on('value', (snap) => {
         const grid = document.getElementById('mainGrid');
         grid.innerHTML = ''; 
@@ -144,23 +148,18 @@
                         <img src="Untitled Design - 1.png" class="card-logo">
                         <h2>${val.title}</h2>
                     </div>
-                    <div class="video-box">
-                        <iframe src="https://www.youtube.com/embed/${val.ytId}" allowfullscreen></iframe>
-                    </div>
+                    <div class="video-box"><iframe src="https://www.youtube.com/embed/${val.ytId}" allowfullscreen></iframe></div>
                     <div class="info">
                         <div class="btn-group">
-                            <button class="btn btn-code" onclick="toggle('${key}')">VIEW CODE</button>
+                            <button class="btn btn-code" onclick="toggle('${key}')">CODE</button>
                             <a href="https://youtu.be/${val.ytId}" target="_blank" class="btn btn-yt">WATCH</a>
-                            <button class="btn creator-btn" style="background:#444" onclick="del('${key}')">🗑️</button>
                         </div>
                         <pre id="${key}" class="code-area">${val.code}</pre>
                     </div>
                 </div>`;
         });
-        checkLoginStatus();
     });
 
-    // SEARCH SYSTEM
     function filterProjects() {
         const q = document.getElementById('searchBar').value.toLowerCase();
         document.querySelectorAll('.project-card').forEach(c => {
@@ -168,60 +167,37 @@
         });
     }
 
-    // 🌌 ADVANCED NEON MATRIX ANIMATION
+    // BG Animation Engine (Simplified for mobile performance)
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
-    let points = [];
-    let mouse = { x: null, y: null };
-
+    let dots = [];
     function init() {
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        points = [];
-        for(let i=0; i<100; i++) points.push({
-            x: Math.random()*canvas.width, y: Math.random()*canvas.height, 
-            vx: Math.random()*0.6-0.3, vy: Math.random()*0.6-0.3, size: Math.random()*2
-        });
+        dots = [];
+        let count = window.innerWidth < 768 ? 30 : 80; // Fewer dots on mobile
+        for(let i=0; i<count; i++) dots.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: Math.random()*0.4-0.2, vy: Math.random()*0.4-0.2});
     }
-
     function animate() {
         ctx.clearRect(0,0,canvas.width, canvas.height);
-        ctx.fillStyle = "rgba(0, 210, 255, 0.4)";
-        points.forEach(p => {
-            p.x += p.vx; p.y += p.vy;
-            if(p.x<0 || p.x>canvas.width) p.vx *= -1;
-            if(p.y<0 || p.y>canvas.height) p.vy *= -1;
-            ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
-
-            // Draw line to mouse
-            let dx = mouse.x - p.x; let dy = mouse.y - p.y;
-            let dist = Math.sqrt(dx*dx + dy*dy);
-            if(dist < 150) {
-                ctx.strokeStyle = `rgba(0, 210, 255, ${1 - dist/150})`;
-                ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
-            }
+        ctx.fillStyle = "rgba(0, 210, 255, 0.2)";
+        dots.forEach(d => {
+            d.x += d.vx; d.y += d.vy;
+            if(d.x<0 || d.x>canvas.width) d.vx *= -1;
+            if(d.y<0 || d.y>canvas.height) d.vy *= -1;
+            ctx.beginPath(); ctx.arc(d.x, d.y, 1.5, 0, Math.PI*2); ctx.fill();
         });
         requestAnimationFrame(animate);
     }
-
-    window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
     window.addEventListener('resize', init);
     init(); animate();
 
-    // ADMIN TOOLS
     function publish() {
         const title = document.getElementById('newTitle').value;
         const ytId = getID(document.getElementById('newURL').value);
         const code = document.getElementById('newCode').value;
         if(title && ytId) db.ref('projects').push({ title, ytId, code });
     }
-    function del(k) { if(confirm("Delete permanently?")) db.ref('projects').child(k).remove(); }
-    function login() { if(prompt("Access Key:") === "BRO123") { sessionStorage.setItem('isAdmin', 'true'); checkLoginStatus(); } }
-    function checkLoginStatus() {
-        if(sessionStorage.getItem('isAdmin') === 'true') {
-            document.getElementById('creator-tools').style.display = 'block';
-            document.querySelectorAll('.creator-btn').forEach(b => b.style.display = 'inline-block');
-        }
-    }
+    function login() { if(prompt("Pass:") === "BRO123") document.getElementById('creator-tools').style.display = 'block'; }
     function toggle(id) { let e = document.getElementById(id); e.style.display = (e.style.display==='block'?'none':'block'); }
 </script>
 </body>

@@ -7,25 +7,25 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        :root { --bg: #030712; --accent: #00d2ff; --glass: rgba(15, 23, 42, 0.8); }
+        :root { --bg: #030712; --accent: #00d2ff; --glass: rgba(15, 23, 42, 0.85); }
         
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: #f8fafc; font-family: 'Segoe UI', system-ui, sans-serif; overflow-x: hidden; }
         
-        /* 🌌 GLOBAL ANIMATION LAYER */
+        /* 🌌 BACKGROUND */
         #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; width: 100vw; height: 100vh; pointer-events: none; }
 
         header { 
             padding: 40px 20px; text-align: center; 
-            background: linear-gradient(180deg, rgba(0, 210, 255, 0.1) 0%, transparent 100%);
+            background: linear-gradient(180deg, rgba(0, 210, 255, 0.15) 0%, transparent 100%);
             border-bottom: 1px solid rgba(0, 210, 255, 0.2);
             animation: fadeInDown 0.8s ease-out;
         }
         
         .site-logo { 
             width: 90px; height: 90px; border-radius: 50%; border: 2px solid var(--accent); 
-            box-shadow: 0 0 30px rgba(0, 210, 255, 0.4); margin-bottom: 15px;
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.5); margin-bottom: 15px;
+            transition: 0.5s;
         }
         .site-logo:hover { transform: scale(1.1) rotate(10deg); }
 
@@ -35,11 +35,10 @@
             background: var(--glass); color: white; outline: none; transition: 0.3s;
             backdrop-filter: blur(10px); font-size: 16px;
         }
-        #searchBar:focus { border-color: var(--accent); box-shadow: 0 0 20px rgba(0, 210, 255, 0.3); width: 105%; }
+        #searchBar:focus { border-color: var(--accent); box-shadow: 0 0 20px rgba(0, 210, 255, 0.4); }
 
         .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 15px; }
         
-        /* 📱 SMART GRID */
         .project-grid { 
             display: grid; grid-template-columns: 1fr; gap: 20px; 
             perspective: 1000px;
@@ -49,31 +48,33 @@
         @media (min-width: 1024px) { .project-grid { grid-template-columns: repeat(3, 1fr); } }
 
         .project-card { 
-            background: var(--glass); backdrop-filter: blur(15px); 
+            background: var(--glass); backdrop-filter: blur(12px); 
             border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.08); 
-            overflow: hidden; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden; transition: 0.4s;
             animation: cardEntrance 0.6s ease-out backwards;
+            display: flex; flex-direction: column;
         }
-        .project-card:hover { transform: translateY(-10px) scale(1.02); border-color: var(--accent); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .project-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
-        .card-header { display: flex; align-items: center; padding: 15px; background: rgba(0,0,0,0.2); gap: 12px; }
+        .card-header { display: flex; align-items: center; padding: 15px; background: rgba(0,0,0,0.3); gap: 12px; }
         .card-logo { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--accent); }
-        h2 { font-size: 1.1rem; color: #fff; font-weight: 500; }
+        h2 { font-size: 1.1rem; color: #fff; font-weight: 600; flex: 1; }
 
         .video-box { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
+        /* Fix for Shorts Thumbnails */
         .video-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
 
-        .info { padding: 20px; }
-        .btn-group { display: flex; gap: 10px; }
+        .info { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+        .btn-group { display: flex; gap: 10px; margin-top: auto; }
         .btn { 
             flex: 1; padding: 14px; border: none; border-radius: 14px; 
-            font-weight: 600; cursor: pointer; color: white; text-align: center; 
-            text-decoration: none; font-size: 0.85rem; transition: 0.3s;
-            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; cursor: pointer; color: white; text-align: center; 
+            text-decoration: none; font-size: 0.8rem; transition: 0.2s;
         }
         .btn-code { background: #334155; }
-        .btn-yt { background: linear-gradient(45deg, #ff0000, #e11d48); }
+        .btn-yt { background: linear-gradient(45deg, #ff0000, #ef4444); }
         .btn:active { transform: scale(0.95); }
+        .creator-btn { display: none; background: #475569; }
 
         .code-area { 
             background: #000; color: #4ade80; padding: 15px; border-radius: 12px; 
@@ -81,13 +82,11 @@
             border: 1px solid rgba(0, 210, 255, 0.3); font-size: 0.8rem; overflow-x: auto;
         }
 
-        /* ADMIN PANEL */
         #creator-tools { display: none; background: #1e293b; padding: 25px; border-radius: 25px; margin-bottom: 30px; border: 2px dashed var(--accent); }
         .inp { width: 100%; padding: 14px; margin-bottom: 12px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 12px; font-size: 16px; }
 
-        /* ANIMATIONS */
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes cardEntrance { from { opacity: 0; transform: translateY(30px) rotateX(-10deg); } to { opacity: 1; transform: translateY(0) rotateX(0); } }
+        @keyframes cardEntrance { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -98,22 +97,24 @@
     <img src="Untitled Design - 1.png" class="site-logo">
     <h1>DIGITAL CIRCUIT HUB</h1>
     <div class="search-container">
-        <input type="text" id="searchBar" placeholder="Search Projects..." onkeyup="filterProjects()">
+        <input type="text" id="searchBar" placeholder="Search projects..." onkeyup="filterProjects()">
     </div>
 </header>
 
 <div class="container">
     <div id="creator-tools">
+        <h3 style="color:var(--accent); margin-bottom:15px;">🚀 Post New Project</h3>
         <input type="text" id="newTitle" class="inp" placeholder="Project Name">
-        <input type="text" id="newURL" class="inp" placeholder="YouTube URL">
+        <input type="text" id="newURL" class="inp" placeholder="Paste ANY YouTube Link (Shorts allowed)">
         <textarea id="newCode" class="inp" style="height:100px" placeholder="Paste Arduino Code"></textarea>
         <button class="btn btn-yt" style="width:100%" onclick="publish()">SAVE TO CLOUD</button>
     </div>
+
     <div class="project-grid" id="mainGrid"></div>
 </div>
 
 <div style="text-align: center; padding: 60px 0;">
-    <button onclick="login()" style="background:none; border:none; color:rgba(255,255,255,0.03);">[ ADMIN ]</button>
+    <button onclick="login()" style="background:none; border:none; color:rgba(255,255,255,0.05); font-size:1.2rem;">[ ADMIN ]</button>
 </div>
 
 <script>
@@ -129,10 +130,10 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // 🛠️ UNIVERSAL LINK FIXER (Handles Shorts, Watch, Embed, Youtu.be)
     function getID(url) {
-        const reg = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-        const match = url.match(reg);
-        return (match && match[2].length === 11) ? match[2] : url;
+        url = url.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/|\/shorts\/)/);
+        return (url[2] !== undefined) ? url[2].split(/[^0-9a-z_\-]/i)[0] : url[0];
     }
 
     db.ref('projects').on('value', (snap) => {
@@ -142,6 +143,11 @@
         snap.forEach((child) => {
             const val = child.val();
             const key = child.key;
+            
+            // Generate clean Thumbnail and Embed
+            const thumbUrl = `https://img.youtube.com/vi/${val.ytId}/hqdefault.jpg`;
+            const embedUrl = `https://www.youtube.com/embed/${val.ytId}`;
+
             const card = document.createElement('div');
             card.className = 'project-card';
             card.style.animationDelay = `${delay}s`;
@@ -151,81 +157,57 @@
                     <img src="Untitled Design - 1.png" class="card-logo">
                     <h2>${val.title}</h2>
                 </div>
-                <div class="video-box"><iframe src="https://www.youtube.com/embed/${val.ytId}" allowfullscreen></iframe></div>
+                <div class="video-box">
+                    <iframe src="${embedUrl}" allowfullscreen title="${val.title}"></iframe>
+                </div>
                 <div class="info">
                     <div class="btn-group">
-                        <button class="btn btn-code" onclick="toggle('${key}')">SOURCE CODE</button>
+                        <button class="btn btn-code" onclick="toggle('${key}')">CODE</button>
                         <a href="https://youtu.be/${val.ytId}" target="_blank" class="btn btn-yt">WATCH</a>
+                        <button class="btn creator-btn" onclick="del('${key}')">🗑️</button>
                     </div>
                     <pre id="${key}" class="code-area">${val.code}</pre>
                 </div>`;
             grid.appendChild(card);
             delay += 0.1;
         });
+        checkLoginStatus();
     });
 
-    // 🌌 ADVANCED INTERACTIVE BACKGROUND
+    // 🌌 BACKGROUND ANIMATION
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
-    let mouse = { x: null, y: null };
-
-    class Particle {
-        constructor() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.size = Math.random() * 2 + 0.5;
-            this.speedX = Math.random() * 0.5 - 0.25;
-            this.speedY = Math.random() * 0.5 - 0.25;
-        }
-        update() {
-            this.x += this.speedX;
-            this.y += this.speedY;
-            if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
-            if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
-        }
-        draw() {
-            ctx.fillStyle = 'rgba(0, 210, 255, 0.3)';
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
-        }
-    }
-
+    
     function init() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         particles = [];
-        for (let i = 0; i < 60; i++) particles.push(new Particle());
+        for (let i = 0; i < 50; i++) particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 2,
+            speedX: Math.random() * 0.5 - 0.25,
+            speedY: Math.random() * 0.5 - 0.25
+        });
     }
 
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(0, 210, 255, 0.25)';
         particles.forEach(p => {
-            p.update();
-            p.draw();
-            
-            // Mouse Interaction
-            let dx = mouse.x - p.x;
-            let dy = mouse.y - p.y;
-            let distance = Math.sqrt(dx*dx + dy*dy);
-            if (distance < 150) {
-                ctx.strokeStyle = `rgba(0, 210, 255, ${1 - distance/150})`;
-                ctx.lineWidth = 0.5;
-                ctx.beginPath();
-                ctx.moveTo(p.x, p.y);
-                ctx.lineTo(mouse.x, mouse.y);
-                ctx.stroke();
-            }
+            p.x += p.speedX; p.y += p.speedY;
+            if (p.x > canvas.width || p.x < 0) p.speedX *= -1;
+            if (p.y > canvas.height || p.y < 0) p.speedY *= -1;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
         });
         requestAnimationFrame(animate);
     }
-
-    window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
-    window.addEventListener('touchstart', (e) => { mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY; });
+    
+    window.addEventListener('load', () => { init(); animate(); });
     window.addEventListener('resize', init);
-    init(); animate();
 
+    // LOGIC
     function filterProjects() {
         const q = document.getElementById('searchBar').value.toLowerCase();
         document.querySelectorAll('.project-card').forEach(c => {
@@ -235,11 +217,29 @@
 
     function publish() {
         const title = document.getElementById('newTitle').value;
-        const ytId = getID(document.getElementById('newURL').value);
+        const rawUrl = document.getElementById('newURL').value;
+        const ytId = getID(rawUrl); // New Cleaner Function
         const code = document.getElementById('newCode').value;
-        if(title && ytId) db.ref('projects').push({ title, ytId, code });
+        
+        if(title && ytId.length === 11) {
+            db.ref('projects').push({ title, ytId, code });
+            alert("Published! (Shorts Fixed)");
+            document.getElementById('newTitle').value = ''; 
+            document.getElementById('newURL').value = ''; 
+            document.getElementById('newCode').value = '';
+        } else {
+            alert("Error: Invalid Link. Please check the URL.");
+        }
     }
-    function login() { if(prompt("Pass:") === "BRO123") document.getElementById('creator-tools').style.display = 'block'; }
+
+    function del(k) { if(confirm("Delete this project?")) db.ref('projects').child(k).remove(); }
+    function login() { if(prompt("Pass:") === "BRO123") { sessionStorage.setItem('isAdmin', 'true'); checkLoginStatus(); } }
+    function checkLoginStatus() {
+        if(sessionStorage.getItem('isAdmin') === 'true') {
+            document.getElementById('creator-tools').style.display = 'block';
+            document.querySelectorAll('.creator-btn').forEach(b => b.style.display = 'inline-block');
+        }
+    }
     function toggle(id) { let e = document.getElementById(id); e.style.display = (e.style.display==='block'?'none':'block'); }
 </script>
 </body>

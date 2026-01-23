@@ -84,7 +84,7 @@
 <header>
     <div id="welcomeMsg" class="user-greeting"></div>
     <div id="projCount" class="stats-badge">Loading Hub...</div><br>
-    <img src="Untitled Design - 1.png" class="site-logo" onclick="checkAdmin()"><br>
+    <img src="Untitled Desgin - 1.png" class="site-logo" onclick="checkAdmin()"><br>
     <input type="text" id="searchBar" placeholder="Search Circuits..." onkeyup="filterProjects()">
 </header>
 
@@ -216,6 +216,32 @@
         requestAnimationFrame(draw);
     }
     init(); draw();
+    
+    // 🔍 SEARCH FUNCTION
+    function filterProjects() {
+        // 1. Get what the user typed
+        const input = document.getElementById('searchBar');
+        const filter = input.value.toUpperCase();
+        
+        // 2. Get all project cards
+        const grid = document.getElementById('mainGrid');
+        const cards = grid.getElementsByClassName('project-card');
+
+        // 3. Loop through them and hide the ones that don't match
+        for (let i = 0; i < cards.length; i++) {
+            const h3 = cards[i].getElementsByTagName("h3")[0];
+            if (h3) {
+                const txtValue = h3.textContent || h3.innerText;
+                // If the title matches the search, show it. If not, hide it.
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    cards[i].style.display = "";
+                } else {
+                    cards[i].style.display = "none";
+                }
+            }
+        }
+    }
 </script>
 </body>
 </html>
+

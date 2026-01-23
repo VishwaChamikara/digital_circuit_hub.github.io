@@ -2,105 +2,163 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Digital Circuit Hub | Official</title>
-    <link rel="icon" type="image/png" href="logo.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Circuit Hub | Pro</title>
     
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     
     <style>
         :root {
-            --bg: #030712; --text: #f8fafc; --accent: #00d2ff;
-            --glass: rgba(15, 23, 42, 0.85); --card-border: rgba(255, 255, 255, 0.1);
+            --primary: #00d2ff;
+            --bg: #050505;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #e2e8f0;
         }
 
-        body.light-mode {
-            --bg: #f1f5f9; --text: #0f172a; --glass: rgba(255, 255, 255, 0.9);
-            --card-border: rgba(0, 210, 255, 0.2);
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background-color: var(--bg); 
+            color: var(--text); 
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
         }
+
+        /* 🌌 Animated Background */
+        .grid-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(circle at 2px 2px, rgba(0, 210, 255, 0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+            z-index: -1;
+        }
+
+        /* 📱 Navigation */
+        nav {
+            position: sticky; top: 0; width: 100%; padding: 20px;
+            background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border); z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .logo-text { font-family: 'Fira Code', monospace; color: var(--primary); font-weight: bold; font-size: 1.2rem; cursor: pointer; }
+
+        /* 🏠 Hero Section */
+        header { padding: 100px 20px 50px; text-align: center; max-width: 900px; margin: 0 auto; }
+        h1 { font-size: 3.5rem; margin-bottom: 20px; letter-spacing: -2px; }
+        .terminal-text { font-family: 'Fira Code', monospace; color: var(--primary); background: rgba(0,210,255,0.1); padding: 5px 15px; border-radius: 5px; }
+
+        /* 🔍 Search bar */
+        .search-container { margin: 40px auto; max-width: 600px; position: relative; }
+        #searchBar {
+            width: 100%; padding: 15px 25px; border-radius: 12px;
+            border: 1px solid var(--border); background: var(--card-bg);
+            color: white; font-size: 1rem; outline: none; transition: 0.3s;
+        }
+        #searchBar:focus { border-color: var(--primary); box-shadow: 0 0 20px rgba(0, 210, 255, 0.2); }
+
+        /* 👥 Legends Section (Bento Style) */
+        .stats-row { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; max-width: 1200px; margin: 0 auto 40px; padding: 0 20px; }
+        .bento-card {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 24px; padding: 25px; backdrop-filter: blur(5px);
+        }
+        .user-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+        .tag { font-family: 'Fira Code', monospace; font-size: 0.8rem; color: var(--primary); border: 1px solid rgba(0,210,255,0.3); padding: 4px 10px; border-radius: 6px; }
+
+        /* 🎬 Project Grid */
+        .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .project-card {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 24px; overflow: hidden; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .project-card:hover { transform: translateY(-10px); border-color: var(--primary); background: rgba(255,255,255,0.05); }
         
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg); color: var(--text); transition: 0.3s; overflow-x: hidden; }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
         
-        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; width: 100vw; height: 100vh; pointer-events: none; }
+        .card-content { padding: 20px; }
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        .btn { 
+            flex: 1; padding: 12px; border-radius: 10px; border: none; 
+            font-weight: 600; cursor: pointer; text-decoration: none; text-align: center;
+            transition: 0.2s; font-size: 0.9rem;
+        }
+        .btn-code { background: #1e293b; color: white; }
+        .btn-yt { background: var(--primary); color: #000; }
+        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
 
-        .theme-btn { position: fixed; top: 20px; right: 20px; z-index: 100; width: 45px; height: 45px; border-radius: 50%; border: none; background: var(--accent); cursor: pointer; font-size: 20px; box-shadow: 0 0 15px var(--accent); }
+        /* 🔐 Login Overlay */
+        #loginOverlay {
+            position: fixed; inset: 0; background: #050505; z-index: 2000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .login-box { width: 90%; max-width: 400px; text-align: center; }
+        .login-input {
+            width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--border);
+            background: #111; color: white; margin-bottom: 20px; font-size: 1rem;
+        }
 
-        header { padding: 60px 20px 20px; text-align: center; }
-        .site-logo { width: 90px; border-radius: 50%; border: 2px solid var(--accent); margin-bottom: 15px; cursor: pointer; }
+        #admin-panel { display: none; background: rgba(0, 210, 255, 0.05); border: 1px dashed var(--primary); padding: 30px; border-radius: 24px; max-width: 600px; margin: 20px auto; }
 
-        #searchBar { width: 90%; max-width: 500px; padding: 15px 25px; border-radius: 50px; border: 2px solid var(--accent); background: var(--glass); color: var(--text); outline: none; margin-bottom: 25px; backdrop-filter: blur(10px); font-size: 1rem; }
-
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        
-        /* Legends Section */
-        .user-hub { background: var(--glass); padding: 20px; border-radius: 20px; margin-bottom: 30px; border: 1px solid var(--card-border); text-align: center; }
-        .user-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 15px; }
-        .tag { background: rgba(0, 210, 255, 0.15); color: var(--accent); padding: 6px 12px; border-radius: 50px; font-size: 0.85rem; border: 1px solid var(--accent); }
-
-        /* Project Grid */
-        .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
-        .project-card { background: var(--glass); border-radius: 24px; border: 1px solid var(--card-border); overflow: hidden; transition: 0.3s; }
-        .project-card:hover { transform: scale(1.02); border-color: var(--accent); }
-
-        .video-box { position: relative; padding-bottom: 56.25%; height: 0; }
-        .video-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-        
-        .btn-group { display: flex; gap: 10px; padding: 15px; }
-        .btn { flex: 1; padding: 12px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; font-size: 0.9rem; transition: 0.2s; }
-        .btn-code { background: #334155; color: white; }
-        .btn-yt { background: #ff0000; color: white; }
-        .btn:active { transform: scale(0.95); }
-
-        .code-area { background: #000; color: #00ff41; padding: 15px; border-radius: 12px; font-family: monospace; white-space: pre; overflow-x: auto; display: none; margin: 10px; border: 1px solid #333; font-size: 0.85rem; }
-
-        /* Login */
-        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; text-align: center; }
-        #admin-panel { display: none; background: var(--glass); padding: 25px; border-radius: 20px; border: 2px dashed var(--accent); margin-bottom: 30px; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            .stats-row { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-<canvas id="bg-canvas"></canvas>
-<button class="theme-btn" onclick="toggleTheme()">🌓</button>
+<div class="grid-bg"></div>
 
 <div id="loginOverlay">
-    <div style="width: 85%; max-width: 350px;">
-        <h2 style="color:var(--accent); margin-bottom:25px; letter-spacing: 2px;">CIRCUIT HUB</h2>
-        <input type="text" id="userName" style="width:100%; padding:15px; border-radius:12px; border:none; margin-bottom:20px;" placeholder="Your Name...">
-        <button class="btn btn-yt" style="width:100%; padding: 15px;" onclick="handleLogin()">ENTER HUB</button>
+    <div class="login-box">
+        <h2 style="margin-bottom: 30px; font-size: 2rem;">SYSTEM.ACCESS()</h2>
+        <input type="text" id="userName" class="login-input" placeholder="Enter identification...">
+        <button class="btn btn-yt" style="width: 100%;" onclick="handleLogin()">AUTHENTICATE</button>
     </div>
 </div>
+
+<nav>
+    <div class="logo-text" onclick="checkAdmin()">DIGITAL_CIRCUIT_HUB</div>
+    <div id="welcomeMsg" style="font-size: 0.8rem; opacity: 0.7;"></div>
+</nav>
 
 <header>
-    <div id="welcomeMsg" style="font-weight: bold; color: var(--accent); margin-bottom: 10px;"></div>
-    <img src="logo.png" class="site-logo" onclick="checkAdmin()">
-    <br>
-    <input type="text" id="searchBar" placeholder="Search projects (e.g. Smart Light)..." onkeyup="filterProjects()">
+    <h1>Build the <span style="color:var(--primary)">Future</span></h1>
+    <p><span class="terminal-text">$ sudo start --maker-journey</span></p>
+    
+    <div class="search-container">
+        <input type="text" id="searchBar" placeholder="Search for circuits, code, or tutorials..." onkeyup="filterProjects()">
+    </div>
 </header>
 
-<div class="container">
-    <div class="user-hub">
-        <h3 style="font-size: 0.9rem; opacity: 0.8;">LEGENDS ONLINE</h3>
+<div class="stats-row">
+    <div class="bento-card">
+        <h4 style="color:var(--primary); font-size: 0.8rem; margin-bottom: 10px;">SYSTEM STATUS</h4>
+        <div id="projCount" style="font-size: 1.5rem; font-weight: bold;">Loading...</div>
+        <p style="opacity: 0.5; font-size: 0.8rem;">Live Projects Available</p>
+    </div>
+    <div class="bento-card">
+        <h4 style="color:var(--primary); font-size: 0.8rem; margin-bottom: 10px;">LOGGED_IN_LEGENDS</h4>
         <div class="user-tags" id="user-list"></div>
     </div>
-
-    <div id="admin-panel">
-        <h3 style="margin-bottom:15px;">Admin Control</h3>
-        <input type="text" id="vTitle" placeholder="Project Title" style="width:100%; margin-bottom:10px; padding:10px; border-radius:8px;">
-        <input type="text" id="vId" placeholder="YouTube Video ID" style="width:100%; margin-bottom:10px; padding:10px; border-radius:8px;">
-        <textarea id="vCode" placeholder="Arduino Code" style="width:100%; height:120px; margin-bottom:10px; padding:10px; border-radius:8px;"></textarea>
-        <button class="btn btn-yt" style="width:100%" onclick="uploadProject()">PUBLISH TO HUB</button>
-    </div>
-
-    <div class="project-grid" id="mainGrid"></div>
 </div>
 
+<div id="admin-panel">
+    <h3>UPLOAD NEW COMPONENT</h3>
+    <input type="text" id="vTitle" class="login-input" placeholder="Project Name">
+    <input type="text" id="vId" class="login-input" placeholder="YouTube Video ID">
+    <textarea id="vCode" class="login-input" style="height:150px;" placeholder="Paste Arduino Code..."></textarea>
+    <button class="btn btn-yt" style="width:100%" onclick="uploadProject()">DEPLOY PROJECT</button>
+</div>
+
+<div class="project-grid" id="mainGrid"></div>
+
 <script>
-    // --- FIREBASE CONFIG ---
+    // --- AUTH & DATABASE CONFIG ---
     const firebaseConfig = {
       apiKey: "AIzaSyBefDwNTP-DO9ApeBydZAlNcVyD5pxfhUQ",
       authDomain: "digitalcircuithub.firebaseapp.com",
@@ -113,26 +171,12 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // --- SEARCH LOGIC ---
-    function filterProjects() {
-        const input = document.getElementById('searchBar').value.toUpperCase();
-        const cards = document.getElementsByClassName('project-card');
-
-        for (let i = 0; i < cards.length; i++) {
-            const title = cards[i].querySelector('h3').innerText.toUpperCase();
-            cards[i].style.display = title.includes(input) ? "" : "none";
-        }
-    }
-
-    // --- AUTH & LOGIN ---
     function handleLogin() {
         const name = document.getElementById('userName').value.trim();
-        if(name.length > 1) {
+        if(name) {
             localStorage.setItem('hubUser', name);
             db.ref('public_users').push({ name: name, time: Date.now() });
             location.reload();
-        } else {
-            alert("Enter a real name, bro!");
         }
     }
 
@@ -140,47 +184,53 @@
         const name = localStorage.getItem('hubUser');
         if(name) {
             document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('welcomeMsg').innerText = "Hello, " + name;
+            document.getElementById('welcomeMsg').innerText = "Logged as: " + name;
         }
     }
 
-    // --- USER LIST SYNC ---
-    db.ref('public_users').limitToLast(15).on('value', (snap) => {
+    // --- REALTIME SYNC ---
+    db.ref('public_users').limitToLast(10).on('value', (snap) => {
         const list = document.getElementById('user-list');
         list.innerHTML = '';
         snap.forEach(child => {
-            list.innerHTML += `<span class="tag">⚡ ${child.val().name}</span>`;
+            list.innerHTML += `<span class="tag">${child.val().name}</span>`;
         });
     });
 
-    // --- PROJECT LOADING ---
     db.ref('projects').on('value', (snap) => {
         const grid = document.getElementById('mainGrid');
         grid.innerHTML = '';
+        let count = 0;
         snap.forEach(child => {
             const val = child.val();
             const key = child.key;
+            count++;
             grid.innerHTML += `
                 <div class="project-card">
-                    <div class="video-box"><iframe src="https://www.youtube.com/embed/${val.ytId}"></iframe></div>
-                    <div style="padding:15px;"><h3>${val.title}</h3></div>
-                    <div class="btn-group">
-                        <button class="btn btn-code" onclick="toggleCode('${key}')">CODE</button>
-                        <a href="https://youtu.be/${val.ytId}" target="_blank" class="btn btn-yt">WATCH</a>
+                    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${val.ytId}"></iframe></div>
+                    <div class="card-content">
+                        <h3>${val.title}</h3>
+                        <div class="btn-group">
+                            <button class="btn btn-code" onclick="alert('Code: \\n${val.code.replace(/'/g, "\\'")}')">VIEW CODE</button>
+                            <a href="https://youtu.be/${val.ytId}" target="_blank" class="btn btn-yt">WATCH TUTORIAL</a>
+                        </div>
                     </div>
-                    <pre id="code_${key}" class="code-area">${val.code}</pre>
                 </div>`;
         });
+        document.getElementById('projCount').innerText = count;
     });
 
-    function toggleCode(id) {
-        const el = document.getElementById('code_'+id);
-        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    function filterProjects() {
+        const input = document.getElementById('searchBar').value.toUpperCase();
+        const cards = document.getElementsByClassName('project-card');
+        for (let i = 0; i < cards.length; i++) {
+            const title = cards[i].querySelector('h3').innerText.toUpperCase();
+            cards[i].style.display = title.includes(input) ? "" : "none";
+        }
     }
 
-    // --- ADMIN TOOLS ---
     function checkAdmin() {
-        if(prompt("Enter PIN:") === "BRO123") {
+        if(prompt("ACCESS_CODE:") === "BRO123") {
             document.getElementById('admin-panel').style.display = 'block';
         }
     }
@@ -191,35 +241,11 @@
         const code = document.getElementById('vCode').value;
         if(title && ytId) {
             db.ref('projects').push({ title, ytId, code });
-            alert("Project Live!");
+            alert("Project Pushed Successfully!");
             location.reload();
         }
     }
-
-    function toggleTheme() { document.body.classList.toggle('light-mode'); }
-
-    // --- BG CANVAS ANIMATION ---
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    let pts = [];
-    function init() {
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        pts = [];
-        for(let i=0; i<30; i++) pts.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:Math.random()-0.5, vy:Math.random()-0.5});
-    }
-    function draw() {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle = "#00d2ff22";
-        pts.forEach(p => {
-            p.x+=p.vx; p.y+=p.vy;
-            if(p.x<0||p.x>canvas.width) p.vx*=-1;
-            if(p.y<0||p.y>canvas.height) p.vy*=-1;
-            ctx.beginPath(); ctx.arc(p.x,p.y,2,0,Math.PI*2); ctx.fill();
-        });
-        requestAnimationFrame(draw);
-    }
-    init(); draw();
-    window.addEventListener('resize', init);
 </script>
+
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Digital Circuit Hub |Official</title>
+    <title>Digital Circuit Hub | Admin Mode</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     
@@ -13,10 +13,9 @@
     <style>
         :root {
             --primary: #00d2ff;
-            --secondary: #7000ff;
+            --secondary: #ff0055; /* Changed for Delete Button color */
             --bg: #030712;
             --card-bg: rgba(255, 255, 255, 0.03);
-            --glass: rgba(15, 23, 42, 0.6);
             --border: rgba(255, 255, 255, 0.1);
             --text: #e2e8f0;
         }
@@ -27,9 +26,9 @@
         /* 🌌 ANIMATED BACKGROUND */
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
-        /* 🔔 CUSTOM TOAST NOTIFICATION */
+        /* 🔔 TOAST NOTIFICATION */
         #toast {
-            visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center;
+            visibility: hidden; min-width: 250px; background-color: #111; color: #fff; text-align: center;
             border-radius: 50px; padding: 16px; position: fixed; z-index: 5000; left: 50%; bottom: 30px;
             transform: translateX(-50%); font-size: 1rem; border: 1px solid var(--primary);
             box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
@@ -56,7 +55,6 @@
         /* 🔘 BUTTONS */
         .btn { border: none; padding: 12px 20px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.9rem; text-decoration: none; display: inline-block; }
         .btn-neon { background: var(--primary); color: #000; width: 100%; font-size: 1.1rem; padding: 15px; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-neon:active { transform: scale(0.98); }
         .btn-code { background: rgba(255,255,255,0.1); color: var(--primary); border: 1px solid var(--primary); width: 48%; }
         .btn-watch { background: var(--primary); color: #000; width: 48%; }
         .btn:hover { filter: brightness(1.2); }
@@ -89,7 +87,9 @@
         .bento-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 800px; margin: 0 auto 40px; padding: 0 20px; }
         .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 20px; text-align: center; }
         .user-list-container { grid-column: span 2; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-        .tag { font-family: 'Fira Code', monospace; font-size: 0.75rem; color: var(--primary); background: rgba(0, 210, 255, 0.1); padding: 5px 10px; border-radius: 6px; }
+        .tag { font-family: 'Fira Code', monospace; font-size: 0.75rem; color: var(--primary); background: rgba(0, 210, 255, 0.1); padding: 5px 10px; border-radius: 6px; display:flex; align-items:center; gap:5px; }
+        .delete-x { color: var(--secondary); cursor: pointer; font-weight: bold; font-size: 0.9rem; transition:0.2s; }
+        .delete-x:hover { color: white; }
 
         /* 🎬 PROJECTS */
         .projects-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; padding: 20px; }
@@ -114,7 +114,7 @@
         .modal-footer { padding: 15px; background: #1e293b; text-align: center; }
 
         /* 🕵️ ADMIN PANEL */
-        #admin-panel { display: none; margin: 20px auto; max-width: 600px; padding: 20px; border: 1px dashed var(--secondary); border-radius: 15px; background: rgba(112, 0, 255, 0.05); }
+        #admin-panel { display: none; margin: 20px auto; max-width: 600px; padding: 20px; border: 1px dashed var(--secondary); border-radius: 15px; background: rgba(255, 0, 85, 0.05); }
         
         @media (max-width: 600px) { h1 { font-size: 2rem; } .bento-grid { grid-template-columns: 1fr; } .user-list-container { grid-column: span 1; } }
     </style>
@@ -122,7 +122,6 @@
 <body>
 
 <canvas id="bg-canvas"></canvas>
-
 <div id="toast">Message Here</div>
 
 <div id="loginOverlay">
@@ -153,7 +152,8 @@
 </nav>
 
 <div class="header-section">
-    <img src='logo.pg' class="profile-img" alt="Founder">
+    <img src="logo.png" class="profile-img" alt="Founder" onerror="this.src='https://via.placeholder.com/130/00d2ff/000000?text=LOGO'">
+    
     <h1>Build. Code. <span style="color:var(--primary)">Dominate.</span></h1>
     <div class="typewriter" id="typing-text"></div>
     <input type="text" id="searchBar" placeholder="Search projects (e.g. Smart Light, Robot)..." onkeyup="filterProjects()">
@@ -171,11 +171,12 @@
 </div>
 
 <div id="admin-panel">
-    <h3 style="color:var(--secondary); margin-bottom:15px;">ADMIN UPLOAD</h3>
+    <h3 style="color:var(--secondary); margin-bottom:15px;">ADMIN MODE ACTIVE</h3>
+    <p style="font-size:0.8rem; margin-bottom:15px;">You can now delete users from the Legends list above.</p>
     <input type="text" id="vTitle" class="login-input" placeholder="Title">
     <input type="text" id="vId" class="login-input" placeholder="YouTube ID">
     <textarea id="vCode" class="login-input" style="height:100px; text-align:left;" placeholder="Code..."></textarea>
-    <button class="btn btn-neon" style="background:var(--secondary); color:white;" onclick="uploadProject()">PUBLISH</button>
+    <button class="btn btn-neon" style="background:var(--secondary); color:white;" onclick="uploadProject()">PUBLISH PROJECT</button>
 </div>
 
 <div class="projects-container" id="mainGrid"></div>
@@ -194,7 +195,11 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // 2. TOAST NOTIFICATION FUNCTION
+    // GLOBAL VARIABLES
+    let isAdmin = false;
+    let latestSnap = null; // Store user list snapshot
+
+    // 2. TOAST NOTIFICATION
     function showToast(msg) {
         const x = document.getElementById("toast");
         x.innerText = msg;
@@ -212,49 +217,73 @@
             document.getElementById('userStatus').innerText = "Online: " + name;
             showToast("Welcome, " + name + " ⚡");
         } else {
-            alert("Name required for access!");
+            alert("Name required!");
         }
     }
 
     window.onload = () => {
-        // Check Login
         const savedName = localStorage.getItem('hubUser');
         if(savedName) {
             document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('userStatus').innerText = "Online: " + savedName;
         }
-        // Start Typewriter
         typeWriter();
-        // Start Particles
         initParticles();
     }
 
-    // 4. MODAL & CODE LOGIC
-    let currentCode = "";
-    
-    function showCode(key) {
-        db.ref('projects/' + key).once('value', (snap) => {
-            if(snap.val()) {
-                currentCode = snap.val().code;
-                document.getElementById('codeDisplay').innerText = currentCode;
-                document.getElementById('codeModal').style.display = 'flex';
+    // 4. ADMIN & DELETION LOGIC (NEW)
+    function toggleAdmin() {
+        // Only asks for PIN if you are not already admin
+        if(!isAdmin) {
+            if(prompt("ADMIN PIN:") === "BRO123") {
+                isAdmin = true;
+                document.getElementById('admin-panel').style.display = 'block';
+                showToast("Admin Privileges: UNLOCKED 🔓");
+                // Rerender list to show 'X' buttons
+                renderUserList(); 
             }
+        }
+    }
+
+    // Function to render the user list (With or Without Delete Buttons)
+    function renderUserList() {
+        const list = document.getElementById('user-list');
+        list.innerHTML = '';
+        if(!latestSnap) return;
+
+        latestSnap.forEach(child => {
+            const val = child.val();
+            const key = child.key;
+            
+            let html = `<span class="tag">${val.name}`;
+            
+            // Only add the DELETE X if Admin is true
+            if(isAdmin) {
+                html += ` <span class="delete-x" onclick="deleteUser('${key}')">✖</span>`;
+            }
+            
+            html += `</span>`;
+            list.innerHTML += html;
         });
     }
 
-    function closeModal() { document.getElementById('codeModal').style.display = 'none'; }
-
-    function copyCode() {
-        navigator.clipboard.writeText(currentCode);
-        showToast("Code Copied to Clipboard! 📋");
-        closeModal();
+    // Function to actually delete from Firebase
+    function deleteUser(key) {
+        if(confirm("Are you sure you want to banish this user?")) {
+            db.ref('public_users/' + key).remove()
+            .then(() => {
+                showToast("User Deleted.");
+            })
+            .catch((error) => {
+                alert("Error: " + error.message);
+            });
+        }
     }
 
-    // 5. DATA SYNC (Realtime)
+    // 5. DATA SYNC
     db.ref('public_users').limitToLast(12).on('value', (snap) => {
-        const list = document.getElementById('user-list');
-        list.innerHTML = '';
-        snap.forEach(child => { list.innerHTML += `<span class="tag">${child.val().name}</span>`; });
+        latestSnap = snap; // Save data to global var
+        renderUserList();   // Call our smart render function
     });
 
     db.ref('projects').on('value', (snap) => {
@@ -280,14 +309,7 @@
         document.getElementById('projCount').innerText = count;
     });
 
-    // 6. ADMIN & SEARCH
-    function toggleAdmin() {
-        if(prompt("ADMIN PIN:") === "BRO123") {
-            document.getElementById('admin-panel').style.display = 'block';
-            showToast("Admin Mode Active 🔓");
-        }
-    }
-
+    // 6. UPLOAD PROJECT
     function uploadProject() {
         const title = document.getElementById('vTitle').value;
         const ytId = document.getElementById('vId').value;
@@ -299,6 +321,23 @@
         }
     }
 
+    // 7. MODAL LOGIC
+    let currentCode = "";
+    function showCode(key) {
+        db.ref('projects/' + key).once('value', (snap) => {
+            if(snap.val()) {
+                currentCode = snap.val().code;
+                document.getElementById('codeDisplay').innerText = currentCode;
+                document.getElementById('codeModal').style.display = 'flex';
+            }
+        });
+    }
+    function closeModal() { document.getElementById('codeModal').style.display = 'none'; }
+    function copyCode() {
+        navigator.clipboard.writeText(currentCode);
+        showToast("Code Copied! 📋");
+        closeModal();
+    }
     function filterProjects() {
         const input = document.getElementById('searchBar').value.toUpperCase();
         const cards = document.getElementsByClassName('project-card');
@@ -308,10 +347,9 @@
         }
     }
 
-    // 7. ANIMATIONS (Typewriter & Particles)
+    // 8. ANIMATIONS
     const texts = ["Making Hardware Easy.", "100% Free Code.", "Join the Revolution."];
     let count = 0; let index = 0; let currentText = ""; let letter = "";
-    
     function typeWriter() {
         if (count === texts.length) count = 0;
         currentText = texts[count];
@@ -321,14 +359,12 @@
             count++; index = 0; setTimeout(typeWriter, 2000);
         } else { setTimeout(typeWriter, 100); }
     }
-
     function initParticles() {
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
         let particles = [];
         for(let i=0; i<40; i++) particles.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:(Math.random()-.5), vy:(Math.random()-.5)});
-        
         function animate() {
             ctx.clearRect(0,0,canvas.width,canvas.height);
             ctx.fillStyle = "#00d2ff22";

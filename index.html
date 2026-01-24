@@ -210,6 +210,128 @@
     }
 
     function checkAdmin() { if(prompt("ACCESS_CODE:") === "Vishwa_2012") { /* You can add panel display here */ } }
+
+    // --- FIREBASE CONFIG (Make sure yours is correct) ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyBefDwNTP-DO9ApeBydZAlNcVyD5pxfhUQ",
+      authDomain: "digitalcircuithub.firebaseapp.com",
+      databaseURL: "https://digitalcircuithub-default-rtdb.firebaseio.com",
+      projectId: "digitalcircuithub",
+      storageBucket: "digitalcircuithub.firebasestorage.app",
+      messagingSenderId: "682398409831",
+      appId: "1:682398409831:web:0884fa45b9dec7b54020c2"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // 🔓 FIX: LOGIN BUTTON FUNCTION
+    function handleLogin() {
+        const nameInput = document.getElementById('userName');
+        const name = nameInput.value.trim();
+        
+        if(name.length > 1) {
+            localStorage.setItem('hubUser', name);
+            // Save to Firebase Legends list
+            db.ref('public_users').push({ 
+                name: name, 
+                time: Date.now() 
+            }).then(() => {
+                // Hide overlay and show site
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('welcomeMsg').innerText = "> User: " + name;
+            });
+        } else {
+            alert("Enter your name to access the circuits, bro!");
+        }
+    }
+
+    // Check if user is already logged in when page loads
+    window.onload = () => {
+        const savedName = localStorage.getItem('hubUser');
+        if(savedName) {
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('welcomeMsg').innerText = "> User: " + savedName;
+        }
+    }
+
+    // 💻 CODE MODAL FIX
+    let currentCode = "";
+    function showCode(key) {
+        db.ref('projects/' + key).once('value', (snap) => {
+            const data = snap.val();
+            if(data) {
+                currentCode = data.code;
+                document.getElementById('codeBox').innerText = currentCode;
+                document.getElementById('codeModal').style.display = 'flex';
+            }
+        });
+    }
+
+    function closeModal() {
+        document.getElementById('codeModal').style.display = 'none';
+    }
+
+    function copyCode() {
+        navigator.clipboard.writeText(currentCode);
+        const btn = event.target;
+        btn.innerText = "COPIED! ✅";
+        setTimeout(() => { btn.innerText = "COPY TO CLIPBOARD"; }, 2000);
+    }
+
+    // 🕵️‍♂️ ADMIN ACCESS (Click the logo text)
+    function checkAdmin() {
+        const pin = prompt("ENTER ACCESS CODE:");
+        if(pin === "BRO123") {
+            // If you want a panel to show up, add its ID here
+            alert("Admin Access Granted! You can now use the console or panel.");
+            // Example: document.getElementById('admin-panel').style.display = 'block';
+        } else {
+            alert("Unauthorized Access!");
+        }
+    }
+
+    // 🔍 SEARCH FILTER
+    function filterProjects() {
+        const input = document.getElementById('searchBar').value.toUpperCase();
+        const cards = document.getElementsByClassName('project-card');
+        for (let i = 0; i < cards.length; i++) {
+            const title = cards[i].querySelector('h3').innerText.toUpperCase();
+            cards[i].style.display = title.includes(input) ? "" : "none";
+        }
+    }
+
+    // 🔄 REAL-TIME SYNC
+    db.ref('public_users').limitToLast(8).on('value', (snap) => {
+        const list = document.getElementById('user-list');
+        list.innerHTML = '';
+        snap.forEach(child => {
+            list.innerHTML += `<span class="tag">${child.val().name}</span>`;
+        });
+    });
+
+    db.ref('projects').on('value', (snap) => {
+        const grid = document.getElementById('mainGrid');
+        grid.innerHTML = '';
+        let count = 0;
+        snap.forEach(child => {
+            const val = child.val();
+            const key = child.key;
+            count++;
+            grid.innerHTML += `
+                <div class="project-card">
+                    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${val.ytId}"></iframe></div>
+                    <div class="card-content">
+                        <h3>${val.title}</h3>
+                        <div class="btn-group">
+                            <button class="btn btn-code" onclick="showCode('${key}')">VIEW CODE</button>
+                            <a href="https://youtu.be/${val.ytId}" target="_blank" class="btn btn-yt">WATCH</a>
+                        </div>
+                    </div>
+                </div>`;
+        });
+        document.getElementById('projCount').innerText = count;
+    });
 </script>
 </body>
 </html>
+

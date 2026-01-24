@@ -2,127 +2,186 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Circuit Hub | Official</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Digital Circuit Hub |Official</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     
     <style>
         :root {
             --primary: #00d2ff;
-            --bg: #050505;
+            --secondary: #7000ff;
+            --bg: #030712;
             --card-bg: rgba(255, 255, 255, 0.03);
+            --glass: rgba(15, 23, 42, 0.6);
             --border: rgba(255, 255, 255, 0.1);
             --text: #e2e8f0;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        
-        .grid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(circle at 2px 2px, rgba(0, 210, 255, 0.05) 1px, transparent 0); background-size: 40px 40px; z-index: -1; }
 
-        /* 📸 PROFILE PHOTO SECTION */
-        .profile-container { text-align: center; padding-top: 60px; }
-        .profile-img { 
-            width: 120px; height: 120px; border-radius: 50%; 
-            border: 3px solid var(--primary); padding: 5px;
-            box-shadow: 0 0 20px rgba(0, 210, 255, 0.3);
-            transition: 0.3s; cursor: pointer;
+        /* 🌌 ANIMATED BACKGROUND */
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+
+        /* 🔔 CUSTOM TOAST NOTIFICATION */
+        #toast {
+            visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center;
+            border-radius: 50px; padding: 16px; position: fixed; z-index: 5000; left: 50%; bottom: 30px;
+            transform: translateX(-50%); font-size: 1rem; border: 1px solid var(--primary);
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
         }
-        .profile-img:hover { transform: scale(1.1); box-shadow: 0 0 40px var(--primary); }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
 
-        nav { position: sticky; top: 0; width: 100%; padding: 15px 25px; background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); z-index: 100; display: flex; justify-content: space-between; align-items: center; }
-        .logo-text { font-family: 'Fira Code', monospace; color: var(--primary); font-weight: bold; }
+        /* 🔐 LOGIN OVERLAY */
+        #loginOverlay {
+            position: fixed; inset: 0; background: #000; z-index: 2000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .login-box { width: 100%; max-width: 350px; text-align: center; }
+        .glitch-text { font-size: 2.5rem; font-weight: 900; color: white; margin-bottom: 20px; letter-spacing: -1px; text-shadow: 2px 2px var(--primary); }
+        .login-input {
+            width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--border);
+            background: #111; color: white; margin-bottom: 20px; font-size: 1.1rem; text-align: center;
+            outline: none; transition: 0.3s;
+        }
+        .login-input:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); }
 
-        header { padding: 40px 20px; text-align: center; max-width: 900px; margin: 0 auto; }
-        h1 { font-size: 3rem; letter-spacing: -2px; margin-bottom: 10px; }
-        .terminal-text { font-family: 'Fira Code', monospace; color: var(--primary); font-size: 0.9rem; }
+        /* 🔘 BUTTONS */
+        .btn { border: none; padding: 12px 20px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.9rem; text-decoration: none; display: inline-block; }
+        .btn-neon { background: var(--primary); color: #000; width: 100%; font-size: 1.1rem; padding: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-neon:active { transform: scale(0.98); }
+        .btn-code { background: rgba(255,255,255,0.1); color: var(--primary); border: 1px solid var(--primary); width: 48%; }
+        .btn-watch { background: var(--primary); color: #000; width: 48%; }
+        .btn:hover { filter: brightness(1.2); }
 
-        #searchBar { width: 90%; max-width: 500px; padding: 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--card-bg); color: white; outline: none; margin-top: 30px; }
-
-        /* 👥 BENTO STATS */
-        .stats-row { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; max-width: 1100px; margin: 0 auto 40px; padding: 0 20px; }
-        .bento-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 20px; }
-        .tag { font-family: 'Fira Code', monospace; font-size: 0.75rem; color: var(--primary); border: 1px solid rgba(0,210,255,0.2); padding: 4px 8px; border-radius: 5px; margin: 3px; display: inline-block; }
-
-        /* 🎬 GRID */
-        .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; max-width: 1100px; margin: 0 auto; padding: 20px; }
-        .project-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; transition: 0.3s; }
-        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        /* 📸 PROFILE & HEADER */
+        nav { position: sticky; top: 0; width: 100%; padding: 15px 25px; background: rgba(3, 7, 18, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'Fira Code', monospace; font-weight: bold; color: var(--primary); cursor: pointer; }
         
-        .card-content { padding: 15px; }
-        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
-        .btn { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; font-size: 0.85rem; }
-        .btn-code { background: #1e293b; color: white; }
-        .btn-yt { background: var(--primary); color: #000; }
+        .header-section { text-align: center; padding: 50px 20px; }
+        .profile-img {
+            width: 130px; height: 130px; border-radius: 50%; object-fit: cover;
+            border: 3px solid var(--primary); padding: 4px;
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.2);
+            margin-bottom: 20px; transition: 0.3s;
+        }
+        .profile-img:hover { transform: scale(1.05); box-shadow: 0 0 50px var(--primary); }
+        
+        h1 { font-size: 2.8rem; line-height: 1.1; margin-bottom: 10px; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .typewriter { font-family: 'Fira Code', monospace; color: var(--primary); font-size: 0.9rem; min-height: 20px; }
 
-        /* 💻 CODE MODAL (The Fix for the button) */
-        #codeModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; padding: 20px; align-items: center; justify-content: center; }
-        .modal-content { background: #111; border: 1px solid var(--primary); padding: 20px; border-radius: 15px; width: 90%; max-width: 700px; }
-        .code-display { background: #000; color: #00ff41; padding: 15px; border-radius: 10px; overflow-x: auto; max-height: 400px; font-family: 'Fira Code', monospace; white-space: pre; margin-top: 15px; font-size: 0.8rem; }
+        /* 🔍 SEARCH */
+        #searchBar {
+            width: 90%; max-width: 500px; padding: 16px; border-radius: 50px;
+            border: 1px solid var(--border); background: rgba(255,255,255,0.05);
+            color: white; font-size: 1rem; outline: none; margin-top: 25px;
+            backdrop-filter: blur(5px);
+        }
 
-        #loginOverlay { position: fixed; inset: 0; background: #050505; z-index: 2000; display: flex; align-items: center; justify-content: center; }
-        .login-input { width: 100%; padding: 15px; border-radius: 10px; border: 1px solid var(--border); background: #111; color: white; margin-bottom: 15px; }
+        /* 🍱 BENTO GRID STATS */
+        .bento-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 800px; margin: 0 auto 40px; padding: 0 20px; }
+        .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 20px; text-align: center; }
+        .user-list-container { grid-column: span 2; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .tag { font-family: 'Fira Code', monospace; font-size: 0.75rem; color: var(--primary); background: rgba(0, 210, 255, 0.1); padding: 5px 10px; border-radius: 6px; }
 
-        @media (max-width: 600px) { h1 { font-size: 2rem; } .stats-row { grid-template-columns: 1fr; } }
+        /* 🎬 PROJECTS */
+        .projects-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .project-card {
+            background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px; overflow: hidden;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        .project-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        
+        .video-box { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
+        .video-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        
+        .card-info { padding: 20px; }
+        .card-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; color: white; }
+        .card-actions { display: flex; justify-content: space-between; gap: 10px; }
+
+        /* 💻 CODE MODAL */
+        #codeModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 3000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: #0f172a; border: 1px solid var(--border); width: 100%; max-width: 700px; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; max-height: 80vh; }
+        .modal-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #1e293b; }
+        .code-area { background: #000; color: #4ade80; padding: 20px; overflow-y: auto; font-family: 'Fira Code', monospace; font-size: 0.85rem; line-height: 1.5; flex-grow: 1; white-space: pre-wrap; }
+        .modal-footer { padding: 15px; background: #1e293b; text-align: center; }
+
+        /* 🕵️ ADMIN PANEL */
+        #admin-panel { display: none; margin: 20px auto; max-width: 600px; padding: 20px; border: 1px dashed var(--secondary); border-radius: 15px; background: rgba(112, 0, 255, 0.05); }
+        
+        @media (max-width: 600px) { h1 { font-size: 2rem; } .bento-grid { grid-template-columns: 1fr; } .user-list-container { grid-column: span 1; } }
     </style>
 </head>
 <body>
 
-<div class="grid-bg"></div>
+<canvas id="bg-canvas"></canvas>
+
+<div id="toast">Message Here</div>
 
 <div id="loginOverlay">
-    <div style="width: 90%; max-width: 350px; text-align: center;">
-        <h2 style="color:var(--primary); margin-bottom: 20px;">SYSTEM.AUTH</h2>
-        <input type="text" id="userName" class="login-input" placeholder="User Identification...">
-        <button class="btn btn-yt" style="width: 100%; padding: 15px;" onclick="handleLogin()">ACCESS HUB</button>
+    <div class="login-box">
+        <div class="glitch-text">SYSTEM LOCKED</div>
+        <p style="color: #94a3b8; margin-bottom: 25px;">Enter credential to access The Hub.</p>
+        <input type="text" id="userName" class="login-input" placeholder="CODENAME..." autocomplete="off">
+        <button class="btn btn-neon" onclick="handleLogin()">UNLOCK ACCESS</button>
     </div>
 </div>
 
 <div id="codeModal">
     <div class="modal-content">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 style="color:var(--primary)">Project Source Code</h3>
+        <div class="modal-header">
+            <h3 style="color:white;">Source Code</h3>
             <button onclick="closeModal()" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
         </div>
-        <div id="codeBox" class="code-display"></div>
-        <button class="btn btn-yt" style="margin-top:15px; width:100%;" onclick="copyCode()">COPY TO CLIPBOARD</button>
+        <div id="codeDisplay" class="code-area">Loading...</div>
+        <div class="modal-footer">
+            <button class="btn btn-neon" onclick="copyCode()">COPY TO CLIPBOARD</button>
+        </div>
     </div>
 </div>
 
 <nav>
-    <div class="logo-text" onclick="checkAdmin()">DIGITAL_CIRCUIT_HUB</div>
-    <div id="welcomeMsg" style="font-size: 0.75rem; opacity: 0.6;"></div>
+    <div class="logo" onclick="toggleAdmin()">DIGITAL_CIRCUIT_HUB_</div>
+    <div id="userStatus" style="font-size: 0.8rem; color: #94a3b8;">Guest</div>
 </nav>
 
-<div class="profile-container">
-    <img src="Untitled design - 1.png" class="profile-img" alt="Founder" onerror="this.src='https://via.placeholder.com/150/00d2ff/ffffff?text=Founder'">
+<div class="header-section">
+    <img src='logo.pg' class="profile-img" alt="Founder">
+    <h1>Build. Code. <span style="color:var(--primary)">Dominate.</span></h1>
+    <div class="typewriter" id="typing-text"></div>
+    <input type="text" id="searchBar" placeholder="Search projects (e.g. Smart Light, Robot)..." onkeyup="filterProjects()">
 </div>
 
-<header>
-    <h1>Innovation <span style="color:var(--primary)">Unleashed</span></h1>
-    <p class="terminal-text">> Building the future, one circuit at a time.</p>
-    <input type="text" id="searchBar" placeholder="Search components..." onkeyup="filterProjects()">
-</header>
-
-<div class="stats-row">
-    <div class="bento-card">
-        <p style="color:var(--primary); font-size: 0.7rem;">DATABASE_STATUS</p>
-        <div id="projCount" style="font-size: 1.8rem; font-weight: bold;">0</div>
-        <p style="opacity: 0.5; font-size: 0.7rem;">Circuits Deployed</p>
+<div class="bento-grid">
+    <div class="stat-card">
+        <div style="font-size: 0.8rem; color: var(--primary); margin-bottom: 5px;">LIVE CIRCUITS</div>
+        <div id="projCount" style="font-size: 2rem; font-weight: 900;">0</div>
     </div>
-    <div class="bento-card">
-        <p style="color:var(--primary); font-size: 0.7rem;">HUB_LEGENDS</p>
-        <div class="user-tags" id="user-list"></div>
+    <div class="stat-card user-list-container">
+        <div style="width:100%; font-size: 0.8rem; color: var(--primary); margin-bottom: 10px;">LOGGED_IN_LEGENDS</div>
+        <div id="user-list" style="display:flex; flex-wrap:wrap; gap:5px; justify-content:center;"></div>
     </div>
 </div>
 
-<div class="project-grid" id="mainGrid"></div>
+<div id="admin-panel">
+    <h3 style="color:var(--secondary); margin-bottom:15px;">ADMIN UPLOAD</h3>
+    <input type="text" id="vTitle" class="login-input" placeholder="Title">
+    <input type="text" id="vId" class="login-input" placeholder="YouTube ID">
+    <textarea id="vCode" class="login-input" style="height:100px; text-align:left;" placeholder="Code..."></textarea>
+    <button class="btn btn-neon" style="background:var(--secondary); color:white;" onclick="uploadProject()">PUBLISH</button>
+</div>
+
+<div class="projects-container" id="mainGrid"></div>
 
 <script>
+    // 1. FIREBASE CONFIG
     const firebaseConfig = {
       apiKey: "AIzaSyBefDwNTP-DO9ApeBydZAlNcVyD5pxfhUQ",
       authDomain: "digitalcircuithub.firebaseapp.com",
@@ -135,31 +194,51 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // 2. TOAST NOTIFICATION FUNCTION
+    function showToast(msg) {
+        const x = document.getElementById("toast");
+        x.innerText = msg;
+        x.className = "show";
+        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+    }
+
+    // 3. LOGIN LOGIC
     function handleLogin() {
         const name = document.getElementById('userName').value.trim();
-        if(name) {
+        if(name.length > 1) {
             localStorage.setItem('hubUser', name);
             db.ref('public_users').push({ name: name, time: Date.now() });
-            location.reload();
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('userStatus').innerText = "Online: " + name;
+            showToast("Welcome, " + name + " ⚡");
+        } else {
+            alert("Name required for access!");
         }
     }
 
     window.onload = () => {
-        const name = localStorage.getItem('hubUser');
-        if(name) {
+        // Check Login
+        const savedName = localStorage.getItem('hubUser');
+        if(savedName) {
             document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('welcomeMsg').innerText = "> User: " + name;
+            document.getElementById('userStatus').innerText = "Online: " + savedName;
         }
+        // Start Typewriter
+        typeWriter();
+        // Start Particles
+        initParticles();
     }
 
-    // --- CODE MODAL LOGIC (THE FIX) ---
+    // 4. MODAL & CODE LOGIC
     let currentCode = "";
+    
     function showCode(key) {
         db.ref('projects/' + key).once('value', (snap) => {
-            const code = snap.val().code;
-            currentCode = code;
-            document.getElementById('codeBox').innerText = code;
-            document.getElementById('codeModal').style.display = 'flex';
+            if(snap.val()) {
+                currentCode = snap.val().code;
+                document.getElementById('codeDisplay').innerText = currentCode;
+                document.getElementById('codeModal').style.display = 'flex';
+            }
         });
     }
 
@@ -167,11 +246,12 @@
 
     function copyCode() {
         navigator.clipboard.writeText(currentCode);
-        alert("Code Copied, Bro!");
+        showToast("Code Copied to Clipboard! 📋");
+        closeModal();
     }
 
-    // --- DATA SYNC ---
-    db.ref('public_users').limitToLast(8).on('value', (snap) => {
+    // 5. DATA SYNC (Realtime)
+    db.ref('public_users').limitToLast(12).on('value', (snap) => {
         const list = document.getElementById('user-list');
         list.innerHTML = '';
         snap.forEach(child => { list.innerHTML += `<span class="tag">${child.val().name}</span>`; });
@@ -187,12 +267,12 @@
             count++;
             grid.innerHTML += `
                 <div class="project-card">
-                    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${val.ytId}"></iframe></div>
-                    <div class="card-content">
-                        <h3>${val.title}</h3>
-                        <div class="btn-group">
-                            <button class="btn btn-code" onclick="showCode('${key}')">VIEW CODE</button>
-                            <a href="https://youtu.be/${val.ytId}" target="_blank" class="btn btn-yt">WATCH</a>
+                    <div class="video-box"><iframe src="https://www.youtube.com/embed/${val.ytId}"></iframe></div>
+                    <div class="card-info">
+                        <div class="card-title">${val.title}</div>
+                        <div class="card-actions">
+                            <button class="btn btn-code" onclick="showCode('${key}')">CODE </> </button>
+                            <a href="https://youtu.be/${val.ytId}" target="_blank" class="btn btn-watch">WATCH ▶</a>
                         </div>
                     </div>
                 </div>`;
@@ -200,138 +280,68 @@
         document.getElementById('projCount').innerText = count;
     });
 
+    // 6. ADMIN & SEARCH
+    function toggleAdmin() {
+        if(prompt("ADMIN PIN:") === "BRO123") {
+            document.getElementById('admin-panel').style.display = 'block';
+            showToast("Admin Mode Active 🔓");
+        }
+    }
+
+    function uploadProject() {
+        const title = document.getElementById('vTitle').value;
+        const ytId = document.getElementById('vId').value;
+        const code = document.getElementById('vCode').value;
+        if(title && ytId) {
+            db.ref('projects').push({ title, ytId, code });
+            showToast("Project Uploaded!");
+            location.reload();
+        }
+    }
+
     function filterProjects() {
         const input = document.getElementById('searchBar').value.toUpperCase();
         const cards = document.getElementsByClassName('project-card');
         for (let i = 0; i < cards.length; i++) {
-            const title = cards[i].querySelector('h3').innerText.toUpperCase();
+            const title = cards[i].querySelector('.card-title').innerText.toUpperCase();
             cards[i].style.display = title.includes(input) ? "" : "none";
         }
     }
 
-    function checkAdmin() { if(prompt("ACCESS_CODE:") === "Vishwa_2012") { /* You can add panel display here */ } }
+    // 7. ANIMATIONS (Typewriter & Particles)
+    const texts = ["Making Hardware Easy.", "100% Free Code.", "Join the Revolution."];
+    let count = 0; let index = 0; let currentText = ""; let letter = "";
+    
+    function typeWriter() {
+        if (count === texts.length) count = 0;
+        currentText = texts[count];
+        letter = currentText.slice(0, ++index);
+        document.getElementById('typing-text').textContent = "> " + letter + "|";
+        if (letter.length === currentText.length) {
+            count++; index = 0; setTimeout(typeWriter, 2000);
+        } else { setTimeout(typeWriter, 100); }
+    }
 
-    // --- FIREBASE CONFIG (Make sure yours is correct) ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyBefDwNTP-DO9ApeBydZAlNcVyD5pxfhUQ",
-      authDomain: "digitalcircuithub.firebaseapp.com",
-      databaseURL: "https://digitalcircuithub-default-rtdb.firebaseio.com",
-      projectId: "digitalcircuithub",
-      storageBucket: "digitalcircuithub.firebasestorage.app",
-      messagingSenderId: "682398409831",
-      appId: "1:682398409831:web:0884fa45b9dec7b54020c2"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    // 🔓 FIX: LOGIN BUTTON FUNCTION
-    function handleLogin() {
-        const nameInput = document.getElementById('userName');
-        const name = nameInput.value.trim();
+    function initParticles() {
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        let particles = [];
+        for(let i=0; i<40; i++) particles.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:(Math.random()-.5), vy:(Math.random()-.5)});
         
-        if(name.length > 1) {
-            localStorage.setItem('hubUser', name);
-            // Save to Firebase Legends list
-            db.ref('public_users').push({ 
-                name: name, 
-                time: Date.now() 
-            }).then(() => {
-                // Hide overlay and show site
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('welcomeMsg').innerText = "> User: " + name;
+        function animate() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = "#00d2ff22";
+            particles.forEach(p => {
+                p.x+=p.vx; p.y+=p.vy;
+                if(p.x<0||p.x>canvas.width) p.vx*=-1;
+                if(p.y<0||p.y>canvas.height) p.vy*=-1;
+                ctx.beginPath(); ctx.arc(p.x,p.y,2,0,Math.PI*2); ctx.fill();
             });
-        } else {
-            alert("Enter your name to access the circuits, bro!");
+            requestAnimationFrame(animate);
         }
+        animate();
     }
-
-    // Check if user is already logged in when page loads
-    window.onload = () => {
-        const savedName = localStorage.getItem('hubUser');
-        if(savedName) {
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('welcomeMsg').innerText = "> User: " + savedName;
-        }
-    }
-
-    // 💻 CODE MODAL FIX
-    let currentCode = "";
-    function showCode(key) {
-        db.ref('projects/' + key).once('value', (snap) => {
-            const data = snap.val();
-            if(data) {
-                currentCode = data.code;
-                document.getElementById('codeBox').innerText = currentCode;
-                document.getElementById('codeModal').style.display = 'flex';
-            }
-        });
-    }
-
-    function closeModal() {
-        document.getElementById('codeModal').style.display = 'none';
-    }
-
-    function copyCode() {
-        navigator.clipboard.writeText(currentCode);
-        const btn = event.target;
-        btn.innerText = "COPIED! ✅";
-        setTimeout(() => { btn.innerText = "COPY TO CLIPBOARD"; }, 2000);
-    }
-
-    // 🕵️‍♂️ ADMIN ACCESS (Click the logo text)
-    function checkAdmin() {
-        const pin = prompt("ENTER ACCESS CODE:");
-        if(pin === "BRO123") {
-            // If you want a panel to show up, add its ID here
-            alert("Admin Access Granted! You can now use the console or panel.");
-            // Example: document.getElementById('admin-panel').style.display = 'block';
-        } else {
-            alert("Unauthorized Access!");
-        }
-    }
-
-    // 🔍 SEARCH FILTER
-    function filterProjects() {
-        const input = document.getElementById('searchBar').value.toUpperCase();
-        const cards = document.getElementsByClassName('project-card');
-        for (let i = 0; i < cards.length; i++) {
-            const title = cards[i].querySelector('h3').innerText.toUpperCase();
-            cards[i].style.display = title.includes(input) ? "" : "none";
-        }
-    }
-
-    // 🔄 REAL-TIME SYNC
-    db.ref('public_users').limitToLast(8).on('value', (snap) => {
-        const list = document.getElementById('user-list');
-        list.innerHTML = '';
-        snap.forEach(child => {
-            list.innerHTML += `<span class="tag">${child.val().name}</span>`;
-        });
-    });
-
-    db.ref('projects').on('value', (snap) => {
-        const grid = document.getElementById('mainGrid');
-        grid.innerHTML = '';
-        let count = 0;
-        snap.forEach(child => {
-            const val = child.val();
-            const key = child.key;
-            count++;
-            grid.innerHTML += `
-                <div class="project-card">
-                    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${val.ytId}"></iframe></div>
-                    <div class="card-content">
-                        <h3>${val.title}</h3>
-                        <div class="btn-group">
-                            <button class="btn btn-code" onclick="showCode('${key}')">VIEW CODE</button>
-                            <a href="https://youtu.be/${val.ytId}" target="_blank" class="btn btn-yt">WATCH</a>
-                        </div>
-                    </div>
-                </div>`;
-        });
-        document.getElementById('projCount').innerText = count;
-    });
 </script>
 </body>
 </html>
-

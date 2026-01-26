@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Digital Circuit Hub | Admin Mode</title>
+    <title>Digital Circuit Hub | Officia</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     
@@ -13,7 +13,7 @@
     <style>
         :root {
             --primary: #00d2ff;
-            --secondary: #ff0055; /* Changed for Delete Button color */
+            --secondary: #ff0055; 
             --bg: #030712;
             --card-bg: rgba(255, 255, 255, 0.03);
             --border: rgba(255, 255, 255, 0.1);
@@ -91,11 +91,18 @@
         .delete-x { color: var(--secondary); cursor: pointer; font-weight: bold; font-size: 0.9rem; transition:0.2s; }
         .delete-x:hover { color: white; }
 
-        /* 🎬 PROJECTS */
+        /* 🎬 PROJECTS & NEW ANIMATION */
         .projects-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .project-card {
             background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px; overflow: hidden;
             transition: transform 0.3s, border-color 0.3s;
+            animation: slideUp 0.6s ease forwards; /* ✨ NEW ANIMATION */
         }
         .project-card:hover { transform: translateY(-5px); border-color: var(--primary); }
         
@@ -156,7 +163,7 @@
     
     <h1>Build. Code. <span style="color:var(--primary)">Dominate.</span></h1>
     <div class="typewriter" id="typing-text"></div>
-    <input type="text" id="searchBar" placeholder="Search projects (e.g. Smart Light, Robot)..." onkeyup="filterProjects()">
+    <input type="text" id="searchBar" placeholder="Search projects..." onkeyup="filterProjects()">
 </div>
 
 <div class="bento-grid">
@@ -172,10 +179,11 @@
 
 <div id="admin-panel">
     <h3 style="color:var(--secondary); margin-bottom:15px;">ADMIN MODE ACTIVE</h3>
-    <p style="font-size:0.8rem; margin-bottom:15px;">You can now delete users from the Legends list above.</p>
-    <input type="text" id="vTitle" class="login-input" placeholder="Title">
-    <input type="text" id="vId" class="login-input" placeholder="YouTube ID">
-    <textarea id="vCode" class="login-input" style="height:100px; text-align:left;" placeholder="Code..."></textarea>
+    <input type="text" id="vTitle" class="login-input" placeholder="Project Title">
+    
+    <input type="text" id="vId" class="login-input" placeholder="Paste Full YouTube Link Here...">
+    
+    <textarea id="vCode" class="login-input" style="height:100px; text-align:left;" placeholder="Paste Code Here..."></textarea>
     <button class="btn btn-neon" style="background:var(--secondary); color:white;" onclick="uploadProject()">PUBLISH PROJECT</button>
 </div>
 
@@ -197,7 +205,7 @@
 
     // GLOBAL VARIABLES
     let isAdmin = false;
-    let latestSnap = null; // Store user list snapshot
+    let latestSnap = null; 
 
     // 2. TOAST NOTIFICATION
     function showToast(msg) {
@@ -231,21 +239,18 @@
         initParticles();
     }
 
-    // 4. ADMIN & DELETION LOGIC (NEW)
+    // 4. ADMIN & DELETION LOGIC
     function toggleAdmin() {
-        // Only asks for PIN if you are not already admin
         if(!isAdmin) {
             if(prompt("ADMIN PIN:") === "BRO123") {
                 isAdmin = true;
                 document.getElementById('admin-panel').style.display = 'block';
-                showToast("Admin Privileges: UNLOCKED 🔓");
-                // Rerender list to show 'X' buttons
+                showToast("Admin Mode: ON 🔓");
                 renderUserList(); 
             }
         }
     }
 
-    // Function to render the user list (With or Without Delete Buttons)
     function renderUserList() {
         const list = document.getElementById('user-list');
         list.innerHTML = '';
@@ -254,36 +259,25 @@
         latestSnap.forEach(child => {
             const val = child.val();
             const key = child.key;
-            
             let html = `<span class="tag">${val.name}`;
-            
-            // Only add the DELETE X if Admin is true
-            if(isAdmin) {
-                html += ` <span class="delete-x" onclick="deleteUser('${key}')">✖</span>`;
-            }
-            
+            if(isAdmin) { html += ` <span class="delete-x" onclick="deleteUser('${key}')">✖</span>`; }
             html += `</span>`;
             list.innerHTML += html;
         });
     }
 
-    // Function to actually delete from Firebase
     function deleteUser(key) {
-        if(confirm("Are you sure you want to banish this user?")) {
+        if(confirm("Banish this user?")) {
             db.ref('public_users/' + key).remove()
-            .then(() => {
-                showToast("User Deleted.");
-            })
-            .catch((error) => {
-                alert("Error: " + error.message);
-            });
+            .then(() => showToast("User Deleted."))
+            .catch(err => alert(err));
         }
     }
 
     // 5. DATA SYNC
     db.ref('public_users').limitToLast(12).on('value', (snap) => {
-        latestSnap = snap; // Save data to global var
-        renderUserList();   // Call our smart render function
+        latestSnap = snap;
+        renderUserList();
     });
 
     db.ref('projects').on('value', (snap) => {
@@ -309,15 +303,31 @@
         document.getElementById('projCount').innerText = count;
     });
 
-    // 6. UPLOAD PROJECT
+    // 6. UPLOAD PROJECT (UPDATED WITH LINK PARSER)
     function uploadProject() {
         const title = document.getElementById('vTitle').value;
-        const ytId = document.getElementById('vId').value;
+        const rawUrl = document.getElementById('vId').value;
         const code = document.getElementById('vCode').value;
+        
+        // 🛠️ SMART LINK PARSER
+        let ytId = "";
+        if(rawUrl.includes("v=")) {
+            ytId = rawUrl.split("v=")[1].split("&")[0];
+        } else if(rawUrl.includes("youtu.be/")) {
+            ytId = rawUrl.split("youtu.be/")[1].split("?")[0];
+        } else {
+            ytId = rawUrl; // Assume it is already an ID
+        }
+
         if(title && ytId) {
             db.ref('projects').push({ title, ytId, code });
-            showToast("Project Uploaded!");
-            location.reload();
+            showToast("Project Uploaded Successfully! 🚀");
+            // Clear inputs
+            document.getElementById('vTitle').value = "";
+            document.getElementById('vId').value = "";
+            document.getElementById('vCode').value = "";
+        } else {
+            alert("Please check your YouTube Link.");
         }
     }
 

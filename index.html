@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Digital Circuit Hub | Officia</title>
+    <title>Digital Circuit Hub | Ultimate Admin</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     
@@ -23,10 +22,8 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
 
-        /* 🌌 ANIMATED BACKGROUND */
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
-        /* 🔔 TOAST NOTIFICATION */
         #toast {
             visibility: hidden; min-width: 250px; background-color: #111; color: #fff; text-align: center;
             border-radius: 50px; padding: 16px; position: fixed; z-index: 5000; left: 50%; bottom: 30px;
@@ -34,77 +31,54 @@
             box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
         }
         #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
-        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
 
-        /* 🔐 LOGIN OVERLAY */
         #loginOverlay {
             position: fixed; inset: 0; background: #000; z-index: 2000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 20px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
         }
         .login-box { width: 100%; max-width: 350px; text-align: center; }
-        .glitch-text { font-size: 2.5rem; font-weight: 900; color: white; margin-bottom: 20px; letter-spacing: -1px; text-shadow: 2px 2px var(--primary); }
+        .glitch-text { font-size: 2.5rem; font-weight: 900; color: white; margin-bottom: 20px; text-shadow: 2px 2px var(--primary); }
         .login-input {
             width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--border);
-            background: #111; color: white; margin-bottom: 20px; font-size: 1.1rem; text-align: center;
-            outline: none; transition: 0.3s;
+            background: #111; color: white; margin-bottom: 20px; font-size: 1.1rem; text-align: center; outline: none;
         }
-        .login-input:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); }
 
-        /* 🔘 BUTTONS */
-        .btn { border: none; padding: 12px 20px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.9rem; text-decoration: none; display: inline-block; }
-        .btn-neon { background: var(--primary); color: #000; width: 100%; font-size: 1.1rem; padding: 15px; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-code { background: rgba(255,255,255,0.1); color: var(--primary); border: 1px solid var(--primary); width: 48%; }
-        .btn-watch { background: var(--primary); color: #000; width: 48%; }
-        .btn:hover { filter: brightness(1.2); }
+        .btn { border: none; padding: 12px 20px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.9rem; text-decoration: none; }
+        .btn-neon { background: var(--primary); color: #000; width: 100%; font-size: 1.1rem; padding: 15px; text-transform: uppercase; }
+        .btn-code { background: rgba(255,255,255,0.1); color: var(--primary); border: 1px solid var(--primary); width: 40%; }
+        .btn-watch { background: var(--primary); color: #000; width: 40%; }
+        /* 🗑️ NEW DELETE BUTTON STYLE */
+        .btn-del-proj { background: var(--secondary); color: white; width: 15%; display: none; justify-content: center; align-items: center; }
 
-        /* 📸 PROFILE & HEADER */
         nav { position: sticky; top: 0; width: 100%; padding: 15px 25px; background: rgba(3, 7, 18, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); z-index: 100; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-family: 'Fira Code', monospace; font-weight: bold; color: var(--primary); cursor: pointer; }
         
         .header-section { text-align: center; padding: 50px 20px; }
-        .profile-img {
-            width: 130px; height: 130px; border-radius: 50%; object-fit: cover;
-            border: 3px solid var(--primary); padding: 4px;
-            box-shadow: 0 0 30px rgba(0, 210, 255, 0.2);
-            margin-bottom: 20px; transition: 0.3s;
-        }
-        .profile-img:hover { transform: scale(1.05); box-shadow: 0 0 50px var(--primary); }
+        .profile-img { width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); padding: 4px; margin-bottom: 20px; }
         
         h1 { font-size: 2.8rem; line-height: 1.1; margin-bottom: 10px; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .typewriter { font-family: 'Fira Code', monospace; color: var(--primary); font-size: 0.9rem; min-height: 20px; }
 
-        /* 🔍 SEARCH */
         #searchBar {
             width: 90%; max-width: 500px; padding: 16px; border-radius: 50px;
             border: 1px solid var(--border); background: rgba(255,255,255,0.05);
             color: white; font-size: 1rem; outline: none; margin-top: 25px;
-            backdrop-filter: blur(5px);
         }
 
-        /* 🍱 BENTO GRID STATS */
         .bento-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 800px; margin: 0 auto 40px; padding: 0 20px; }
         .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 20px; text-align: center; }
         .user-list-container { grid-column: span 2; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
         .tag { font-family: 'Fira Code', monospace; font-size: 0.75rem; color: var(--primary); background: rgba(0, 210, 255, 0.1); padding: 5px 10px; border-radius: 6px; display:flex; align-items:center; gap:5px; }
-        .delete-x { color: var(--secondary); cursor: pointer; font-weight: bold; font-size: 0.9rem; transition:0.2s; }
-        .delete-x:hover { color: white; }
+        .delete-x { color: var(--secondary); cursor: pointer; font-weight: bold; }
 
-        /* 🎬 PROJECTS & NEW ANIMATION */
         .projects-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; padding: 20px; }
         
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
         .project-card {
             background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px; overflow: hidden;
-            transition: transform 0.3s, border-color 0.3s;
-            animation: slideUp 0.6s ease forwards; /* ✨ NEW ANIMATION */
+            transition: transform 0.3s; animation: slideUp 0.6s ease forwards;
         }
-        .project-card:hover { transform: translateY(-5px); border-color: var(--primary); }
         
         .video-box { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
         .video-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
@@ -113,17 +87,14 @@
         .card-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; color: white; }
         .card-actions { display: flex; justify-content: space-between; gap: 10px; }
 
-        /* 💻 CODE MODAL */
         #codeModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 3000; align-items: center; justify-content: center; padding: 20px; }
         .modal-content { background: #0f172a; border: 1px solid var(--border); width: 100%; max-width: 700px; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; max-height: 80vh; }
-        .modal-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #1e293b; }
-        .code-area { background: #000; color: #4ade80; padding: 20px; overflow-y: auto; font-family: 'Fira Code', monospace; font-size: 0.85rem; line-height: 1.5; flex-grow: 1; white-space: pre-wrap; }
-        .modal-footer { padding: 15px; background: #1e293b; text-align: center; }
+        .code-area { background: #000; color: #4ade80; padding: 20px; overflow-y: auto; font-family: 'Fira Code', monospace; white-space: pre-wrap; flex-grow: 1; }
 
-        /* 🕵️ ADMIN PANEL */
         #admin-panel { display: none; margin: 20px auto; max-width: 600px; padding: 20px; border: 1px dashed var(--secondary); border-radius: 15px; background: rgba(255, 0, 85, 0.05); }
         
-        @media (max-width: 600px) { h1 { font-size: 2rem; } .bento-grid { grid-template-columns: 1fr; } .user-list-container { grid-column: span 1; } }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @media (max-width: 600px) { h1 { font-size: 2rem; } .bento-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -134,21 +105,17 @@
 <div id="loginOverlay">
     <div class="login-box">
         <div class="glitch-text">SYSTEM LOCKED</div>
-        <p style="color: #94a3b8; margin-bottom: 25px;">Enter credential to access The Hub.</p>
-        <input type="text" id="userName" class="login-input" placeholder="CODENAME..." autocomplete="off">
-        <button class="btn btn-neon" onclick="handleLogin()">UNLOCK ACCESS</button>
+        <input type="text" id="userName" class="login-input" placeholder="CODENAME...">
+        <button class="btn btn-neon" onclick="handleLogin()">UNLOCK</button>
     </div>
 </div>
 
 <div id="codeModal">
     <div class="modal-content">
-        <div class="modal-header">
-            <h3 style="color:white;">Source Code</h3>
-            <button onclick="closeModal()" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
-        </div>
-        <div id="codeDisplay" class="code-area">Loading...</div>
-        <div class="modal-footer">
-            <button class="btn btn-neon" onclick="copyCode()">COPY TO CLIPBOARD</button>
+        <div id="codeDisplay" class="code-area"></div>
+        <div style="padding:15px; background:#1e293b; text-align:center;">
+            <button class="btn btn-neon" onclick="copyCode()">COPY CODE</button>
+            <button class="btn" onclick="closeModal()" style="color:white;">CLOSE</button>
         </div>
     </div>
 </div>
@@ -160,7 +127,6 @@
 
 <div class="header-section">
     <img src="logo.png" class="profile-img" alt="Founder" onerror="this.src='https://via.placeholder.com/130/00d2ff/000000?text=LOGO'">
-    
     <h1>Build. Code. <span style="color:var(--primary)">Dominate.</span></h1>
     <div class="typewriter" id="typing-text"></div>
     <input type="text" id="searchBar" placeholder="Search projects..." onkeyup="filterProjects()">
@@ -168,29 +134,25 @@
 
 <div class="bento-grid">
     <div class="stat-card">
-        <div style="font-size: 0.8rem; color: var(--primary); margin-bottom: 5px;">LIVE CIRCUITS</div>
-        <div id="projCount" style="font-size: 2rem; font-weight: 900;">0</div>
+        <div style="color:var(--primary); font-size:0.8rem;">CIRCUITS</div>
+        <div id="projCount" style="font-size:2rem; font-weight:900;">0</div>
     </div>
     <div class="stat-card user-list-container">
-        <div style="width:100%; font-size: 0.8rem; color: var(--primary); margin-bottom: 10px;">LOGGED_IN_LEGENDS</div>
-        <div id="user-list" style="display:flex; flex-wrap:wrap; gap:5px; justify-content:center;"></div>
+        <div id="user-list"></div>
     </div>
 </div>
 
 <div id="admin-panel">
-    <h3 style="color:var(--secondary); margin-bottom:15px;">ADMIN MODE ACTIVE</h3>
+    <h3 style="color:var(--secondary); margin-bottom:15px;">ADMIN CONTROL</h3>
     <input type="text" id="vTitle" class="login-input" placeholder="Project Title">
-    
-    <input type="text" id="vId" class="login-input" placeholder="Paste Full YouTube Link Here...">
-    
-    <textarea id="vCode" class="login-input" style="height:100px; text-align:left;" placeholder="Paste Code Here..."></textarea>
-    <button class="btn btn-neon" style="background:var(--secondary); color:white;" onclick="uploadProject()">PUBLISH PROJECT</button>
+    <input type="text" id="vId" class="login-input" placeholder="Paste YouTube Link">
+    <textarea id="vCode" class="login-input" style="height:100px;" placeholder="Paste Code"></textarea>
+    <button class="btn btn-neon" style="background:var(--secondary); color:white;" onclick="uploadProject()">PUBLISH</button>
 </div>
 
 <div class="projects-container" id="mainGrid"></div>
 
 <script>
-    // 1. FIREBASE CONFIG
     const firebaseConfig = {
       apiKey: "AIzaSyBefDwNTP-DO9ApeBydZAlNcVyD5pxfhUQ",
       authDomain: "digitalcircuithub.firebaseapp.com",
@@ -203,151 +165,114 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // GLOBAL VARIABLES
     let isAdmin = false;
-    let latestSnap = null; 
+    let latestUserSnap = null;
 
-    // 2. TOAST NOTIFICATION
     function showToast(msg) {
         const x = document.getElementById("toast");
-        x.innerText = msg;
-        x.className = "show";
-        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+        x.innerText = msg; x.className = "show";
+        setTimeout(() => { x.className = ""; }, 3000);
     }
 
-    // 3. LOGIN LOGIC
     function handleLogin() {
         const name = document.getElementById('userName').value.trim();
-        if(name.length > 1) {
+        if(name) {
             localStorage.setItem('hubUser', name);
             db.ref('public_users').push({ name: name, time: Date.now() });
             document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('userStatus').innerText = "Online: " + name;
-            showToast("Welcome, " + name + " ⚡");
-        } else {
-            alert("Name required!");
         }
     }
 
     window.onload = () => {
-        const savedName = localStorage.getItem('hubUser');
-        if(savedName) {
+        if(localStorage.getItem('hubUser')) {
             document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('userStatus').innerText = "Online: " + savedName;
+            document.getElementById('userStatus').innerText = "Online: " + localStorage.getItem('hubUser');
         }
-        typeWriter();
-        initParticles();
-    }
+        typeWriter(); initParticles();
+    };
 
-    // 4. ADMIN & DELETION LOGIC
     function toggleAdmin() {
-        if(!isAdmin) {
-            if(prompt("ADMIN PIN:") === "BRO123") {
-                isAdmin = true;
-                document.getElementById('admin-panel').style.display = 'block';
-                showToast("Admin Mode: ON 🔓");
-                renderUserList(); 
-            }
+        if(!isAdmin && prompt("ADMIN PIN:") === "BRO123") {
+            isAdmin = true;
+            document.getElementById('admin-panel').style.display = 'block';
+            showToast("Admin Mode: Active 🔓");
+            renderUserList();
+            renderProjects(); // Refresh to show delete buttons
         }
     }
 
     function renderUserList() {
         const list = document.getElementById('user-list');
         list.innerHTML = '';
-        if(!latestSnap) return;
-
-        latestSnap.forEach(child => {
-            const val = child.val();
-            const key = child.key;
-            let html = `<span class="tag">${val.name}`;
-            if(isAdmin) { html += ` <span class="delete-x" onclick="deleteUser('${key}')">✖</span>`; }
-            html += `</span>`;
-            list.innerHTML += html;
+        if(latestUserSnap) latestUserSnap.forEach(child => {
+            list.innerHTML += `<span class="tag">${child.val().name}${isAdmin ? ` <span class="delete-x" onclick="deleteUser('${child.key}')">✖</span>` : ''}</span>`;
         });
     }
 
     function deleteUser(key) {
-        if(confirm("Banish this user?")) {
-            db.ref('public_users/' + key).remove()
-            .then(() => showToast("User Deleted."))
-            .catch(err => alert(err));
+        if(confirm("Delete user?")) db.ref('public_users/' + key).remove();
+    }
+
+    // 🗑️ DELETE PROJECT FUNCTION
+    function deleteProject(key) {
+        if(confirm("PERMANENTLY DELETE THIS PROJECT?")) {
+            db.ref('projects/' + key).remove().then(() => showToast("Project Deleted."));
         }
     }
 
-    // 5. DATA SYNC
     db.ref('public_users').limitToLast(12).on('value', (snap) => {
-        latestSnap = snap;
-        renderUserList();
+        latestUserSnap = snap; renderUserList();
     });
 
-    db.ref('projects').on('value', (snap) => {
-        const grid = document.getElementById('mainGrid');
-        grid.innerHTML = '';
-        let count = 0;
-        snap.forEach(child => {
-            const val = child.val();
-            const key = child.key;
-            count++;
-            grid.innerHTML += `
-                <div class="project-card">
-                    <div class="video-box"><iframe src="https://www.youtube.com/embed/${val.ytId}"></iframe></div>
-                    <div class="card-info">
-                        <div class="card-title">${val.title}</div>
-                        <div class="card-actions">
-                            <button class="btn btn-code" onclick="showCode('${key}')">CODE </> </button>
-                            <a href="https://youtu.be/${val.ytId}" target="_blank" class="btn btn-watch">WATCH ▶</a>
+    function renderProjects() {
+        db.ref('projects').on('value', (snap) => {
+            const grid = document.getElementById('mainGrid');
+            grid.innerHTML = ''; let count = 0;
+            snap.forEach(child => {
+                const val = child.val(); count++;
+                grid.innerHTML += `
+                    <div class="project-card">
+                        <div class="video-box"><iframe src="https://www.youtube.com/embed/${val.ytId}"></iframe></div>
+                        <div class="card-info">
+                            <div class="card-title">${val.title}</div>
+                            <div class="card-actions">
+                                <button class="btn btn-code" onclick="showCode('${child.key}')">CODE</button>
+                                <a href="https://youtu.be/${val.ytId}" target="_blank" class="btn btn-watch">WATCH</a>
+                                <button class="btn btn-del-proj" style="display:${isAdmin ? 'flex' : 'none'}" onclick="deleteProject('${child.key}')">🗑️</button>
+                            </div>
                         </div>
-                    </div>
-                </div>`;
+                    </div>`;
+            });
+            document.getElementById('projCount').innerText = count;
         });
-        document.getElementById('projCount').innerText = count;
-    });
+    }
+    renderProjects();
 
-    // 6. UPLOAD PROJECT (UPDATED WITH LINK PARSER)
     function uploadProject() {
         const title = document.getElementById('vTitle').value;
         const rawUrl = document.getElementById('vId').value;
         const code = document.getElementById('vCode').value;
+        let ytId = rawUrl.includes("v=") ? rawUrl.split("v=")[1].split("&")[0] : rawUrl.includes("youtu.be/") ? rawUrl.split("youtu.be/")[1].split("?")[0] : rawUrl;
         
-        // 🛠️ SMART LINK PARSER
-        let ytId = "";
-        if(rawUrl.includes("v=")) {
-            ytId = rawUrl.split("v=")[1].split("&")[0];
-        } else if(rawUrl.includes("youtu.be/")) {
-            ytId = rawUrl.split("youtu.be/")[1].split("?")[0];
-        } else {
-            ytId = rawUrl; // Assume it is already an ID
-        }
-
         if(title && ytId) {
             db.ref('projects').push({ title, ytId, code });
-            showToast("Project Uploaded Successfully! 🚀");
-            // Clear inputs
-            document.getElementById('vTitle').value = "";
-            document.getElementById('vId').value = "";
-            document.getElementById('vCode').value = "";
-        } else {
-            alert("Please check your YouTube Link.");
+            showToast("Published! 🚀");
+            document.getElementById('vTitle').value = ""; document.getElementById('vId').value = ""; document.getElementById('vCode').value = "";
         }
     }
 
-    // 7. MODAL LOGIC
     let currentCode = "";
     function showCode(key) {
         db.ref('projects/' + key).once('value', (snap) => {
-            if(snap.val()) {
-                currentCode = snap.val().code;
-                document.getElementById('codeDisplay').innerText = currentCode;
-                document.getElementById('codeModal').style.display = 'flex';
-            }
+            currentCode = snap.val().code;
+            document.getElementById('codeDisplay').innerText = currentCode;
+            document.getElementById('codeModal').style.display = 'flex';
         });
     }
     function closeModal() { document.getElementById('codeModal').style.display = 'none'; }
-    function copyCode() {
-        navigator.clipboard.writeText(currentCode);
-        showToast("Code Copied! 📋");
-        closeModal();
-    }
+    function copyCode() { navigator.clipboard.writeText(currentCode); showToast("Copied! 📋"); }
+
     function filterProjects() {
         const input = document.getElementById('searchBar').value.toUpperCase();
         const cards = document.getElementsByClassName('project-card');
@@ -357,36 +282,29 @@
         }
     }
 
-    // 8. ANIMATIONS
     const texts = ["Making Hardware Easy.", "100% Free Code.", "Join the Revolution."];
-    let count = 0; let index = 0; let currentText = ""; let letter = "";
+    let charI = 0, textI = 0;
     function typeWriter() {
-        if (count === texts.length) count = 0;
-        currentText = texts[count];
-        letter = currentText.slice(0, ++index);
-        document.getElementById('typing-text').textContent = "> " + letter + "|";
-        if (letter.length === currentText.length) {
-            count++; index = 0; setTimeout(typeWriter, 2000);
-        } else { setTimeout(typeWriter, 100); }
+        let curr = texts[textI];
+        document.getElementById('typing-text').textContent = "> " + curr.slice(0, charI++) + "|";
+        if(charI > curr.length) { charI = 0; textI = (textI + 1) % texts.length; setTimeout(typeWriter, 2000); }
+        else setTimeout(typeWriter, 100);
     }
+
     function initParticles() {
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        let particles = [];
-        for(let i=0; i<40; i++) particles.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:(Math.random()-.5), vy:(Math.random()-.5)});
-        function animate() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            ctx.fillStyle = "#00d2ff22";
-            particles.forEach(p => {
-                p.x+=p.vx; p.y+=p.vy;
-                if(p.x<0||p.x>canvas.width) p.vx*=-1;
-                if(p.y<0||p.y>canvas.height) p.vy*=-1;
-                ctx.beginPath(); ctx.arc(p.x,p.y,2,0,Math.PI*2); ctx.fill();
+        const c = document.getElementById('bg-canvas'), ctx = c.getContext('2d');
+        c.width = window.innerWidth; c.height = window.innerHeight;
+        let p = Array.from({length:40}, () => ({x:Math.random()*c.width, y:Math.random()*c.height, vx:Math.random()-0.5, vy:Math.random()-0.5}));
+        function draw() {
+            ctx.clearRect(0,0,c.width,c.height); ctx.fillStyle = "#00d2ff11";
+            p.forEach(i => {
+                i.x += i.vx; i.y += i.vy;
+                if(i.x<0 || i.x>c.width) i.vx *= -1; if(i.y<0 || i.y>c.height) i.vy *= -1;
+                ctx.beginPath(); ctx.arc(i.x, i.y, 2, 0, Math.PI*2); ctx.fill();
             });
-            requestAnimationFrame(animate);
+            requestAnimationFrame(draw);
         }
-        animate();
+        draw();
     }
 </script>
 </body>

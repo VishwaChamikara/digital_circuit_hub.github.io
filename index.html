@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Digital Circuit Hub | Build. Code. Dominate.</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@400;500;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -20,110 +20,840 @@
             --card-bg: rgba(255, 255, 255, 0.05);
             --border: rgba(255, 255, 255, 0.1);
             --text: #e2e8f0;
+            --glow-primary: 0 0 20px rgba(0, 210, 255, 0.5);
+            --glow-secondary: 0 0 20px rgba(255, 0, 85, 0.5);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        
+        body { 
+            background-color: var(--bg); 
+            color: var(--text); 
+            font-family: 'Inter', sans-serif; 
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
 
-        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        #bg-canvas { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            z-index: -1; 
+            pointer-events: none; 
+        }
 
-        /* TOAST STYLE */
+        /* ENHANCED TOAST */
         #toast {
-            visibility: hidden; min-width: 250px; background-color: #111; color: #fff; text-align: center;
-            border-radius: 50px; padding: 16px; position: fixed; z-index: 5000; left: 50%; bottom: 30px;
-            transform: translateX(-50%); font-size: 1rem; border: 1px solid var(--primary);
-            box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+            visibility: hidden; 
+            min-width: 300px; 
+            background: linear-gradient(135deg, #111, #1a1a2e); 
+            color: #fff; 
+            text-align: center;
+            border-radius: 16px; 
+            padding: 18px 24px; 
+            position: fixed; 
+            z-index: 5000; 
+            left: 50%; 
+            bottom: 30px;
+            transform: translateX(-50%) translateY(100px); 
+            font-size: 1rem; 
+            font-weight: 600;
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.4), inset 0 0 20px rgba(0, 210, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
-        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        
+        #toast.show { 
+            visibility: visible; 
+            transform: translateX(-50%) translateY(0);
+            animation: toastPulse 2s infinite;
+        }
+        
+        @keyframes toastPulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(0, 210, 255, 0.4), inset 0 0 20px rgba(0, 210, 255, 0.1); }
+            50% { box-shadow: 0 0 50px rgba(0, 210, 255, 0.6), inset 0 0 30px rgba(0, 210, 255, 0.2); }
+        }
 
-        /* LOGIN OVERLAY - BEAST STYLE */
+        /* ENHANCED LOGIN OVERLAY */
         #loginOverlay {
-            position: fixed; inset: 0; background: radial-gradient(circle, #004d66 0%, #000 100%); z-index: 2000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+            position: fixed; 
+            inset: 0; 
+            background: radial-gradient(circle at 50% 50%, #001a2e 0%, #000 70%); 
+            z-index: 2000;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px;
+            overflow: hidden;
         }
-        .login-box { width: 100%; max-width: 380px; text-align: center; }
-        .glitch-text { font-size: 3rem; font-weight: 900; color: white; margin-bottom: 20px; text-transform: uppercase; letter-spacing: -2px; }
+        
+        #loginOverlay::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                linear-gradient(90deg, transparent 50%, rgba(0, 210, 255, 0.03) 50%),
+                linear-gradient(rgba(0, 210, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px, 100% 100%;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+        }
+        
+        .login-box { 
+            width: 100%; 
+            max-width: 420px; 
+            text-align: center; 
+            position: relative;
+            z-index: 10;
+        }
+        
+        .glitch-text { 
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem; 
+            font-weight: 900; 
+            color: white; 
+            margin-bottom: 30px; 
+            text-transform: uppercase; 
+            letter-spacing: 4px;
+            position: relative;
+            text-shadow: 
+                0 0 10px var(--primary),
+                0 0 20px var(--primary),
+                0 0 40px var(--primary);
+            animation: glitch 3s infinite;
+        }
+        
+        @keyframes glitch {
+            0%, 90%, 100% { 
+                text-shadow: 
+                    0 0 10px var(--primary),
+                    0 0 20px var(--primary),
+                    0 0 40px var(--primary);
+                transform: translate(0);
+            }
+            92% { 
+                text-shadow: 
+                    -2px 0 var(--secondary),
+                    2px 0 var(--primary);
+                transform: translate(-2px, 2px);
+            }
+            94% { 
+                text-shadow: 
+                    2px 0 var(--secondary),
+                    -2px 0 var(--primary);
+                transform: translate(2px, -2px);
+            }
+            96% { 
+                text-shadow: 
+                    0 0 10px var(--primary),
+                    0 0 20px var(--primary);
+                transform: translate(0);
+            }
+        }
+        
         .login-input {
-            width: 100%; padding: 18px; border-radius: 15px; border: 3px solid var(--border);
-            background: rgba(0,0,0,0.5); color: white; margin-bottom: 20px; font-size: 1.2rem; text-align: center; outline: none;
-            transition: 0.3s;
+            width: 100%; 
+            padding: 20px; 
+            border-radius: 16px; 
+            border: 2px solid var(--border);
+            background: rgba(0,0,0,0.6); 
+            color: white; 
+            margin-bottom: 25px; 
+            font-size: 1.2rem; 
+            text-align: center; 
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: 'Fira Code', monospace;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
-        .login-input:focus { border-color: var(--primary); background: rgba(0, 210, 255, 0.1); }
+        
+        .login-input:focus { 
+            border-color: var(--primary); 
+            background: rgba(0, 210, 255, 0.1); 
+            box-shadow: 
+                inset 0 0 20px rgba(0,0,0,0.5),
+                0 0 30px rgba(0, 210, 255, 0.3);
+            transform: scale(1.02);
+        }
+        
+        .login-input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
 
-        /* THE BOUNCY BEAST BUTTON */
+        /* ENHANCED BUTTONS */
         .btn { 
-            border: none; border-radius: 12px; font-weight: 900; cursor: pointer; 
-            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
+            border: none; 
+            border-radius: 14px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            text-decoration: none; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-neon { 
+            background: var(--beast-yellow); 
+            color: #000; 
+            width: 100%; 
+            font-size: 1.2rem; 
+            padding: 20px; 
+            border: 3px solid #000; 
+            box-shadow: 
+                0 0 20px rgba(255, 234, 0, 0.4),
+                6px 6px 0px #000;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .btn-neon:hover { 
+            transform: translate(-4px, -4px) scale(1.02); 
+            box-shadow: 
+                0 0 40px rgba(255, 234, 0, 0.6),
+                10px 10px 0px #000;
+        }
+        
+        .btn-neon:active { 
+            transform: translate(2px, 2px); 
+            box-shadow: 
+                0 0 20px rgba(255, 234, 0, 0.4),
+                2px 2px 0px #000;
+        }
+        
+        .btn-code { 
+            background: rgba(255,255,255,0.1); 
+            color: var(--primary); 
+            border: 2px solid var(--primary); 
+            width: 45%; 
+            padding: 12px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+        }
+        
+        .btn-code:hover {
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .btn-watch { 
+            background: var(--primary); 
+            color: #000; 
+            width: 45%; 
+            padding: 12px; 
+            border: 2px solid #000;
+            font-weight: 800;
+        }
+        
+        .btn-watch:hover {
+            background: #fff;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.6);
+            transform: translateY(-2px);
+        }
+        
+        .btn-del-proj { 
+            background: var(--secondary); 
+            color: white; 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 10px;
+            font-size: 1.2rem;
+            display: none;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .btn-del-proj:hover {
+            background: #ff3366;
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.5);
+        }
+
+        /* ENHANCED NAV */
+        nav { 
+            position: sticky; 
+            top: 0; 
+            width: 100%; 
+            padding: 18px 30px; 
+            background: rgba(3, 7, 18, 0.8); 
+            backdrop-filter: blur(20px); 
+            border-bottom: 1px solid var(--border); 
+            z-index: 100; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .logo { 
+            font-family: 'Orbitron', monospace; 
+            font-weight: 900; 
+            color: var(--primary); 
+            cursor: pointer; 
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .logo:hover {
+            text-shadow: 0 0 20px var(--primary);
+            transform: scale(1.05);
+        }
+        
+        .logo::after {
+            content: '_';
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        #userStatus { 
+            font-size: 0.85rem; 
+            font-weight: 700; 
+            color: var(--primary); 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 16px;
+            background: rgba(0, 210, 255, 0.1);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 5px rgba(0, 210, 255, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(0, 210, 255, 0.6); }
+        }
+
+        /* ENHANCED HEADER */
+        .header-section { 
+            text-align: center; 
+            padding: 80px 20px 60px; 
+            position: relative;
+        }
+        
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(0, 210, 255, 0.2) 0%, transparent 70%);
+            filter: blur(40px);
+            pointer-events: none;
+        }
+        
+        .profile-img { 
+            width: 150px; 
+            height: 150px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            border: 4px solid var(--primary); 
+            box-shadow: 
+                0 0 30px rgba(0, 210, 255, 0.4),
+                0 0 60px rgba(0, 210, 255, 0.2),
+                inset 0 0 30px rgba(0, 210, 255, 0.1);
+            margin-bottom: 30px; 
+            transition: all 0.4s ease;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(3deg); }
+        }
+        
+        .profile-img:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 
+                0 0 50px rgba(0, 210, 255, 0.6),
+                0 0 100px rgba(0, 210, 255, 0.3);
+        }
+        
+        h1 { 
+            font-size: 4rem; 
+            font-weight: 900; 
+            line-height: 1.1; 
+            margin-bottom: 20px; 
+            letter-spacing: -3px; 
+            color: white;
+            font-family: 'Orbitron', sans-serif;
             text-transform: uppercase;
         }
-        .btn-neon { 
-            background: var(--beast-yellow); color: #000; width: 100%; font-size: 1.3rem; padding: 18px; 
-            border: 4px solid #000; box-shadow: 6px 6px 0px #000;
-        }
-        .btn-neon:hover { transform: translate(-4px, -4px); box-shadow: 10px 10px 0px #000; }
-        .btn-neon:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000; }
-
-        .btn-code { background: rgba(255,255,255,0.1); color: var(--primary); border: 2px solid var(--primary); width: 45%; padding: 10px; }
-        .btn-watch { background: var(--primary); color: #000; width: 45%; padding: 10px; border: 2px solid #000; }
-        .btn-del-proj { background: var(--secondary); color: white; width: 40px; height: 40px; display: none; }
-
-        /* NAV - GLASSMORPHISM */
-        nav { 
-            position: sticky; top: 0; width: 100%; padding: 15px 25px; 
-            background: rgba(3, 7, 18, 0.7); backdrop-filter: blur(15px); 
-            border-bottom: 1px solid var(--border); z-index: 100; 
-            display: flex; justify-content: space-between; align-items: center; 
-        }
-        .logo { font-family: 'Fira Code', monospace; font-weight: 900; color: var(--primary); cursor: pointer; font-size: 1.2rem; }
         
-        .header-section { text-align: center; padding: 60px 20px; }
-        .profile-img { 
-            width: 140px; height: 140px; border-radius: 50%; object-fit: cover; 
-            border: 4px solid var(--primary); box-shadow: 0 0 30px rgba(0, 210, 255, 0.3); margin-bottom: 25px; 
+        h1 span {
+            background: linear-gradient(135deg, var(--primary), var(--beast-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
         }
         
-        h1 { font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 15px; letter-spacing: -2px; color: white; }
-        .typewriter { font-family: 'Fira Code', monospace; color: var(--primary); font-size: 1.1rem; font-weight: bold; margin-bottom: 20px; }
+        h1 span::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--beast-yellow));
+            border-radius: 2px;
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        
+        .typewriter { 
+            font-family: 'Fira Code', monospace; 
+            color: var(--primary); 
+            font-size: 1.2rem; 
+            font-weight: 600; 
+            margin-bottom: 30px;
+            min-height: 30px;
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+        }
 
+        /* ENHANCED SEARCH */
         #searchBar {
-            width: 90%; max-width: 500px; padding: 18px 25px; border-radius: 50px;
-            border: 2px solid var(--border); background: rgba(255,255,255,0.05);
-            color: white; font-size: 1.1rem; outline: none; transition: 0.3s;
+            width: 90%; 
+            max-width: 550px; 
+            padding: 20px 30px; 
+            border-radius: 50px;
+            border: 2px solid var(--border); 
+            background: rgba(255,255,255,0.05);
+            color: white; 
+            font-size: 1.1rem; 
+            outline: none; 
+            transition: all 0.4s ease;
+            font-family: 'Inter', sans-serif;
+            backdrop-filter: blur(10px);
         }
-        #searchBar:focus { border-color: var(--primary); width: 100%; max-width: 550px; }
+        
+        #searchBar:focus { 
+            border-color: var(--primary); 
+            width: 100%; 
+            max-width: 600px; 
+            box-shadow: 
+                0 0 30px rgba(0, 210, 255, 0.3),
+                inset 0 0 20px rgba(0, 210, 255, 0.1);
+            background: rgba(0, 210, 255, 0.05);
+        }
+        
+        #searchBar::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
 
-        /* BENTO STATS */
-        .bento-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 800px; margin: 0 auto 40px; padding: 0 20px; }
-        .stat-card { background: var(--card-bg); border: 2px solid var(--border); border-radius: 24px; padding: 25px; backdrop-filter: blur(10px); }
-        .user-list-container { grid-column: span 2; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-        .tag { font-family: 'Fira Code', monospace; font-size: 0.8rem; color: var(--primary); background: rgba(0, 210, 255, 0.1); padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(0, 210, 255, 0.2); }
+        /* ENHANCED BENTO GRID */
+        .bento-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px; 
+            max-width: 900px; 
+            margin: 0 auto 50px; 
+            padding: 0 20px; 
+        }
+        
+        .stat-card { 
+            background: var(--card-bg); 
+            border: 2px solid var(--border); 
+            border-radius: 30px; 
+            padding: 30px; 
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 210, 255, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 210, 255, 0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+        
+        .stat-card > div:first-child {
+            color: var(--primary); 
+            font-size: 0.9rem; 
+            font-weight: 700; 
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        
+        #projCount { 
+            font-size: 4rem; 
+            font-weight: 900; 
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 20px rgba(0, 210, 255, 0.5);
+            animation: countGlow 2s infinite;
+        }
+        
+        @keyframes countGlow {
+            0%, 100% { text-shadow: 0 0 20px rgba(0, 210, 255, 0.5); }
+            50% { text-shadow: 0 0 40px rgba(0, 210, 255, 0.8), 0 0 60px rgba(0, 210, 255, 0.4); }
+        }
+        
+        .user-list-container { 
+            grid-column: span 2; 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 10px; 
+            justify-content: center;
+            min-height: 100px;
+        }
+        
+        .tag { 
+            font-family: 'Fira Code', monospace; 
+            font-size: 0.85rem; 
+            color: var(--primary); 
+            background: rgba(0, 210, 255, 0.1); 
+            padding: 10px 16px; 
+            border-radius: 12px; 
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tag:hover {
+            background: rgba(0, 210, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.3);
+        }
+        
+        .tag span {
+            transition: all 0.3s ease;
+        }
+        
+        .tag span:hover {
+            color: var(--secondary);
+            transform: scale(1.2);
+        }
 
-        .projects-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        /* ENHANCED PROJECTS GRID */
+        .projects-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); 
+            gap: 35px; 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
 
-        /* PROJECT CARD BEAST STYLE */
+        /* ENHANCED PROJECT CARD */
         .project-card {
-            background: var(--card-bg); border: 2px solid var(--border); border-radius: 30px; overflow: hidden;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); backdrop-filter: blur(5px);
+            background: var(--card-bg); 
+            border: 2px solid var(--border); 
+            border-radius: 30px; 
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            backdrop-filter: blur(10px);
+            position: relative;
         }
-        .project-card:hover { transform: translateY(-10px) scale(1.02); border-color: var(--primary); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
         
-        .video-box { position: relative; padding-bottom: 56.25%; height: 0; background: #000; overflow: hidden; }
-        .video-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 210, 255, 0.1) 0%, rgba(255, 0, 85, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+            z-index: 1;
+        }
         
-        .card-info { padding: 25px; }
-        .card-title { font-size: 1.4rem; font-weight: 900; margin-bottom: 15px; color: white; text-transform: uppercase; letter-spacing: -0.5px; }
-        .card-actions { display: flex; justify-content: space-between; align-items: center; }
+        .project-card:hover { 
+            transform: translateY(-15px) scale(1.02); 
+            border-color: var(--primary); 
+            box-shadow: 
+                0 30px 60px rgba(0,0,0,0.4),
+                0 0 40px rgba(0, 210, 255, 0.2);
+        }
+        
+        .project-card:hover::before {
+            opacity: 1;
+        }
+        
+        .video-box { 
+            position: relative; 
+            padding-bottom: 56.25%; 
+            height: 0; 
+            background: #000; 
+            overflow: hidden;
+        }
+        
+        .video-box iframe { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            border: 0;
+            transition: transform 0.4s ease;
+        }
+        
+        .project-card:hover .video-box iframe {
+            transform: scale(1.05);
+        }
+        
+        .card-info { 
+            padding: 30px; 
+            position: relative;
+            z-index: 2;
+        }
+        
+        .card-title { 
+            font-size: 1.5rem; 
+            font-weight: 800; 
+            margin-bottom: 20px; 
+            color: white; 
+            text-transform: uppercase; 
+            letter-spacing: -0.5px;
+            font-family: 'Orbitron', sans-serif;
+            line-height: 1.3;
+        }
+        
+        .card-actions { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            gap: 10px;
+        }
 
-        /* MODAL */
-        #codeModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(10px); }
-        .modal-content { background: #0f172a; border: 2px solid var(--primary); width: 100%; max-width: 800px; border-radius: 30px; overflow: hidden; display: flex; flex-direction: column; max-height: 85vh; box-shadow: 0 0 50px rgba(0, 210, 255, 0.2); }
-        .code-area { background: #000; color: #4ade80; padding: 25px; overflow-y: auto; font-family: 'Fira Code', monospace; white-space: pre-wrap; font-size: 0.9rem; line-height: 1.6; }
-
-        #admin-panel { display: none; margin: 30px auto; max-width: 600px; padding: 30px; border: 3px dashed var(--secondary); border-radius: 25px; background: rgba(255, 0, 85, 0.05); }
+        /* ENHANCED MODAL */
+        #codeModal { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.95); 
+            z-index: 3000; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px; 
+            backdrop-filter: blur(20px);
+            animation: fadeIn 0.3s ease;
+        }
         
-        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-        @media (max-width: 600px) { h1 { font-size: 2.5rem; } .bento-grid { grid-template-columns: 1fr; } }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content { 
+            background: linear-gradient(135deg, #0f172a, #1e293b); 
+            border: 3px solid var(--primary); 
+            width: 100%; 
+            max-width: 900px; 
+            border-radius: 30px; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            max-height: 90vh; 
+            box-shadow: 
+                0 0 60px rgba(0, 210, 255, 0.3),
+                inset 0 0 60px rgba(0, 210, 255, 0.05);
+            animation: slideUp 0.4s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .code-area { 
+            background: #050505; 
+            color: #4ade80; 
+            padding: 30px; 
+            overflow-y: auto; 
+            font-family: 'Fira Code', monospace; 
+            white-space: pre-wrap; 
+            font-size: 0.9rem; 
+            line-height: 1.8;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .modal-content > div:last-child {
+            padding: 25px; 
+            background: linear-gradient(135deg, #1e293b, #0f172a); 
+            text-align: center; 
+            display: flex; 
+            gap: 20px; 
+            justify-content: center;
+        }
+
+        /* ENHANCED ADMIN PANEL */
+        #admin-panel { 
+            display: none; 
+            margin: 40px auto; 
+            max-width: 650px; 
+            padding: 40px; 
+            border: 3px dashed var(--secondary); 
+            border-radius: 30px; 
+            background: linear-gradient(135deg, rgba(255, 0, 85, 0.1), rgba(255, 0, 85, 0.05));
+            backdrop-filter: blur(10px);
+            animation: borderPulse 2s infinite;
+        }
+        
+        @keyframes borderPulse {
+            0%, 100% { border-color: rgba(255, 0, 85, 0.5); box-shadow: 0 0 20px rgba(255, 0, 85, 0.2); }
+            50% { border-color: rgba(255, 0, 85, 1); box-shadow: 0 0 40px rgba(255, 0, 85, 0.4); }
+        }
+        
+        #admin-panel h3 {
+            color: var(--secondary); 
+            margin-bottom: 25px; 
+            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+        
+        #admin-panel .login-input {
+            margin-bottom: 20px;
+            border-radius: 12px;
+        }
+        
+        #admin-panel textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+        
+        #admin-panel .btn-neon {
+            background: var(--secondary);
+            color: white;
+            border-color: #000;
+            margin-top: 10px;
+        }
+        
+        #admin-panel .btn-neon:hover {
+            background: #ff3366;
+            box-shadow: 0 0 40px rgba(255, 0, 85, 0.6), 10px 10px 0px #000;
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--beast-yellow);
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 60px;
+            border-top: 1px solid var(--border);
+            color: rgba(255,255,255,0.4);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+        }
+        
+        footer span {
+            color: var(--primary);
+            animation: heartbeat 1.5s infinite;
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* LOADING ANIMATION */
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) { 
+            h1 { font-size: 2.5rem; letter-spacing: -1px; } 
+            .bento-grid { grid-template-columns: 1fr; } 
+            .user-list-container { grid-column: span 1; }
+            .glitch-text { font-size: 2.5rem; }
+            .projects-container { grid-template-columns: 1fr; }
+            .card-actions { flex-wrap: wrap; }
+            .btn-code, .btn-watch { width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -142,49 +872,61 @@
 <div id="codeModal">
     <div class="modal-content">
         <div id="codeDisplay" class="code-area"></div>
-        <div style="padding:20px; background:#1e293b; text-align:center; display: flex; gap: 15px; justify-content: center;">
+        <div>
             <button class="btn btn-neon" style="width: 200px;" onclick="copyCode()">COPY CODE</button>
-            <button class="btn" onclick="closeModal()" style="color:white; background: transparent; border: 2px solid white; padding: 10px 30px;">CLOSE</button>
+            <button class="btn" onclick="closeModal()" style="color:white; background: transparent; border: 2px solid white; padding: 12px 30px; font-weight: 600;">CLOSE</button>
         </div>
     </div>
 </div>
 
 <nav>
-    <div class="logo" onclick="toggleAdmin()">DIGITAL_CIRCUIT_HUB_</div>
-    <div id="userStatus" style="font-size: 0.8rem; font-weight: bold; color: var(--primary); text-transform: uppercase;">Guest</div>
+    <div class="logo" onclick="toggleAdmin()">DIGITAL_CIRCUIT_HUB</div>
+    <div id="userStatus">Guest</div>
 </nav>
 
 <div class="header-section">
-    <img src="logo.png" class="profile-img" alt="Founder" onerror="this.src='https://via.placeholder.com/130/00d2ff/000000?text=LOGO'">
-    <h1 data-aos="fade-down">Build. Code. <span style="color:var(--primary)">Dominate.</span></h1>
+    <img src="logo.png" class="profile-img" alt="Founder" onerror="this.src='https://via.placeholder.com/150/00d2ff/000000?text=LOGO'">
+    <h1 data-aos="fade-down">Build. Code. <span>Dominate.</span></h1>
     <div class="typewriter" id="typing-text"></div>
     <input type="text" id="searchBar" placeholder="Search projects..." onkeyup="filterProjects()" data-aos="fade-up">
 </div>
 
 <div class="bento-grid">
     <div class="stat-card" data-aos="fade-right">
-        <div style="color:var(--primary); font-size:0.9rem; font-weight: 900; text-transform: uppercase;">System Circuits</div>
-        <div id="projCount" style="font-size:3rem; font-weight:900; color: white;">0</div>
+        <div>System Circuits</div>
+        <div id="projCount">0</div>
     </div>
-    <div class="stat-card user-list-container" data-aos="fade-left">
-        <div id="user-list"></div>
+    <div class="stat-card" data-aos="fade-left">
+        <div style="color:var(--primary); font-size:0.9rem; font-weight:700; text-transform:uppercase; margin-bottom:15px;">Active Users</div>
+        <div class="user-list-container" id="user-list"></div>
     </div>
 </div>
 
 <div id="admin-panel" data-aos="flip-up">
-    <h3 style="color:var(--secondary); margin-bottom:20px; font-weight: 900;">ADMIN TERMINAL</h3>
+    <h3>ADMIN TERMINAL</h3>
     <input type="text" id="vTitle" class="login-input" placeholder="Project Title">
     <input type="text" id="vId" class="login-input" placeholder="YouTube Link">
-    <textarea id="vCode" class="login-input" style="height:120px; font-family: 'Fira Code';" placeholder="Paste Code Here"></textarea>
-    <button class="btn btn-neon" style="background:var(--secondary); color:white; border-color: #000;" onclick="uploadProject()">PUBLISH TO HUB</button>
+    <textarea id="vCode" class="login-input" placeholder="Paste Code Here"></textarea>
+    <button class="btn btn-neon" onclick="uploadProject()">PUBLISH TO HUB</button>
 </div>
 
 <div class="projects-container" id="mainGrid"></div>
 
+<footer>
+    <p>Made with <span>⚡</span> by Digital Circuit Hub Team | &copy; 2026</p>
+</footer>
+
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
-    AOS.init({ duration: 800, once: false });
+    // Initialize AOS with enhanced settings
+    AOS.init({ 
+        duration: 1000, 
+        once: false,
+        offset: 100,
+        easing: 'ease-out-cubic'
+    });
 
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyBefDwNTP-DO9ApeBydZAlNcVyD5pxfhUQ",
       authDomain: "digitalcircuithub.firebaseapp.com",
@@ -200,153 +942,369 @@
     let isAdmin = false;
     let latestUserSnap = null;
 
+    // Enhanced confetti burst
     function burst() {
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#00d2ff', '#ff0055', '#ffea00'] });
+        const duration = 3000;
+        const animationEnd = Date.now() + duration;
+        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 5001 };
+
+        const randomInRange = (min, max) => Math.random() * (max - min) + min;
+
+        const interval = setInterval(function() {
+            const timeLeft = animationEnd - Date.now();
+
+            if (timeLeft <= 0) {
+                return clearInterval(interval);
+            }
+
+            const particleCount = 50 * (timeLeft / duration);
+            confetti(Object.assign({}, defaults, { 
+                particleCount, 
+                origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+                colors: ['#00d2ff', '#ff0055', '#ffea00']
+            }));
+            confetti(Object.assign({}, defaults, { 
+                particleCount, 
+                origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+                colors: ['#00d2ff', '#ff0055', '#ffea00']
+            }));
+        }, 250);
     }
 
+    // Enhanced toast notification
     function showToast(msg) {
         const x = document.getElementById("toast");
-        x.innerText = msg; x.className = "show";
+        x.innerText = msg; 
+        x.className = "show";
         setTimeout(() => { x.className = ""; }, 3000);
     }
 
+    // Enhanced login handler
     function handleLogin() {
         const name = document.getElementById('userName').value.trim();
         if(name) {
             burst();
             localStorage.setItem('hubUser', name);
             db.ref('public_users').push({ name: name, time: Date.now() });
+            
+            // Animate overlay exit
+            const overlay = document.getElementById('loginOverlay');
+            overlay.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            overlay.style.opacity = '0';
+            overlay.style.transform = 'scale(1.1)';
+            
             setTimeout(() => {
-                document.getElementById('loginOverlay').style.display = 'none';
+                overlay.style.display = 'none';
                 document.getElementById('userStatus').innerText = "Online: " + name;
+                showToast("Welcome to the Hub, " + name + "! 🚀");
             }, 500);
+        } else {
+            // Shake animation for error
+            const input = document.getElementById('userName');
+            input.style.animation = 'shake 0.5s';
+            setTimeout(() => input.style.animation = '', 500);
         }
     }
+    
+    // Add shake animation dynamically
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+    `;
+    document.head.appendChild(style);
 
+    // Check existing login
     window.onload = () => {
         if(localStorage.getItem('hubUser')) {
             document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('userStatus').innerText = "Online: " + localStorage.getItem('hubUser');
         }
-        typeWriter(); initParticles();
+        typeWriter(); 
+        initParticles();
     };
 
+    // Admin toggle
     function toggleAdmin() {
-        if(!isAdmin && prompt("ADMIN PIN:") === "BRO123") {
-            isAdmin = true;
-            burst();
-            document.getElementById('admin-panel').style.display = 'block';
-            showToast("Admin Mode: Active 🔓");
-            renderUserList();
-            renderProjects();
+        if(!isAdmin) {
+            const pin = prompt("ADMIN PIN:");
+            if(pin === "BRO123") {
+                isAdmin = true;
+                burst();
+                const panel = document.getElementById('admin-panel');
+                panel.style.display = 'block';
+                panel.scrollIntoView({ behavior: 'smooth' });
+                showToast("Admin Mode: Active 🔓");
+                renderUserList();
+                renderProjects();
+            } else if(pin) {
+                showToast("Invalid PIN! Access Denied 🚫");
+            }
         }
     }
 
+    // Render user list
     function renderUserList() {
         const list = document.getElementById('user-list');
         list.innerHTML = '';
-        if(latestUserSnap) latestUserSnap.forEach(child => {
-            list.innerHTML += `<span class="tag">${child.val().name}${isAdmin ? ` <span style="color:red;cursor:pointer" onclick="deleteUser('${child.key}')"> ✖</span>` : ''}</span>`;
-        });
+        if(latestUserSnap) {
+            latestUserSnap.forEach(child => {
+                const userData = child.val();
+                const deleteBtn = isAdmin ? ` <span style="color:var(--secondary);cursor:pointer;margin-left:5px;" onclick="deleteUser('${child.key}')">✕</span>` : '';
+                list.innerHTML += `<span class="tag" data-aos="zoom-in">${userData.name}${deleteBtn}</span>`;
+            });
+        }
     }
 
     function deleteUser(key) {
-        if(confirm("Delete user?")) db.ref('public_users/' + key).remove();
+        if(confirm("Delete user?")) {
+            db.ref('public_users/' + key).remove();
+            showToast("User removed");
+        }
     }
 
     function deleteProject(key) {
         if(confirm("DELETE PROJECT?")) {
-            db.ref('projects/' + key).remove().then(() => showToast("Removed."));
+            db.ref('projects/' + key).remove().then(() => {
+                showToast("Project removed");
+                burst();
+            });
         }
     }
 
-    db.ref('public_users').limitToLast(12).on('value', (snap) => {
-        latestUserSnap = snap; renderUserList();
+    // Listen for users
+    db.ref('public_users').limitToLast(15).on('value', (snap) => {
+        latestUserSnap = snap;
+        renderUserList();
     });
 
+    // Render projects
     function renderProjects() {
         db.ref('projects').on('value', (snap) => {
             const grid = document.getElementById('mainGrid');
-            grid.innerHTML = ''; let count = 0;
+            grid.innerHTML = '';
+            let count = 0;
+            
             snap.forEach(child => {
-                const val = child.val(); count++;
+                const val = child.val();
+                count++;
+                
+                const deleteBtn = isAdmin ? `<button class="btn btn-del-proj" onclick="deleteProject('${child.key}')">🗑️</button>` : '';
+                
                 grid.innerHTML += `
-                    <div class="project-card" data-aos="zoom-in">
-                        <div class="video-box"><iframe src="https://www.youtube.com/embed/${val.ytId}"></iframe></div>
+                    <div class="project-card" data-aos="fade-up" data-aos-delay="${(count % 3) * 100}">
+                        <div class="video-box">
+                            <iframe src="https://www.youtube.com/embed/${val.ytId}" allowfullscreen></iframe>
+                        </div>
                         <div class="card-info">
                             <div class="card-title">${val.title}</div>
                             <div class="card-actions">
                                 <button class="btn btn-code" onclick="showCode('${child.key}')">SOURCE CODE</button>
-                                <a href="https://youtu.be/${val.ytId}" target="_blank" class="btn btn-watch">YOUTUBE</a>
-                                <button class="btn btn-del-proj" style="display:${isAdmin ? 'flex' : 'none'}" onclick="deleteProject('${child.key}')">🗑️</button>
+                                <a href="https://youtu.be/${val.ytId}" target="_blank" class="btn btn-watch">WATCH</a>
+                                ${deleteBtn}
                             </div>
                         </div>
                     </div>`;
             });
-            document.getElementById('projCount').innerText = count;
+            
+            // Animate count
+            animateValue("projCount", 0, count, 1500);
             AOS.refresh();
         });
     }
+    
+    // Number animation
+    function animateValue(id, start, end, duration) {
+        const obj = document.getElementById(id);
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            obj.innerHTML = Math.floor(progress * (end - start) + start);
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+    
     renderProjects();
 
+    // Upload project
     function uploadProject() {
-        const title = document.getElementById('vTitle').value;
-        const rawUrl = document.getElementById('vId').value;
+        const title = document.getElementById('vTitle').value.trim();
+        const rawUrl = document.getElementById('vId').value.trim();
         const code = document.getElementById('vCode').value;
-        let ytId = rawUrl.includes("v=") ? rawUrl.split("v=")[1].split("&")[0] : rawUrl.includes("youtu.be/") ? rawUrl.split("youtu.be/")[1].split("?")[0] : rawUrl;
+        
+        let ytId = rawUrl;
+        if(rawUrl.includes("v=")) {
+            ytId = rawUrl.split("v=")[1].split("&")[0];
+        } else if(rawUrl.includes("youtu.be/")) {
+            ytId = rawUrl.split("youtu.be/")[1].split("?")[0];
+        }
         
         if(title && ytId) {
             burst();
             db.ref('projects').push({ title, ytId, code });
-            showToast("Published! 🚀");
-            document.getElementById('vTitle').value = ""; document.getElementById('vId').value = ""; document.getElementById('vCode').value = "";
+            showToast("Published successfully! 🚀");
+            
+            // Clear inputs with animation
+            ['vTitle', 'vId', 'vCode'].forEach(id => {
+                const el = document.getElementById(id);
+                el.style.transition = 'all 0.3s ease';
+                el.style.transform = 'scale(0.95)';
+                el.style.opacity = '0.5';
+                setTimeout(() => {
+                    el.value = '';
+                    el.style.transform = 'scale(1)';
+                    el.style.opacity = '1';
+                }, 300);
+            });
+        } else {
+            showToast("Please fill in all required fields");
         }
     }
 
+    // Show code modal
     let currentCode = "";
     function showCode(key) {
         db.ref('projects/' + key).once('value', (snap) => {
-            currentCode = snap.val().code;
+            currentCode = snap.val().code || "// No code available";
             document.getElementById('codeDisplay').innerText = currentCode;
             document.getElementById('codeModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         });
     }
-    function closeModal() { document.getElementById('codeModal').style.display = 'none'; }
-    function copyCode() { navigator.clipboard.writeText(currentCode); burst(); showToast("Copied! 📋"); }
+    
+    function closeModal() { 
+        document.getElementById('codeModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    
+    function copyCode() { 
+        navigator.clipboard.writeText(currentCode); 
+        burst(); 
+        showToast("Code copied to clipboard! 📋");
+    }
 
+    // Filter projects
     function filterProjects() {
         const input = document.getElementById('searchBar').value.toUpperCase();
         const cards = document.getElementsByClassName('project-card');
+        
         for (let i = 0; i < cards.length; i++) {
             const title = cards[i].querySelector('.card-title').innerText.toUpperCase();
-            cards[i].style.display = title.includes(input) ? "" : "none";
+            if(title.includes(input)) {
+                cards[i].style.display = "";
+                cards[i].style.animation = 'fadeIn 0.5s ease';
+            } else {
+                cards[i].style.display = "none";
+            }
         }
     }
 
-    const texts = ["Making Hardware Easy.", "100% Free Code.", "Join the Revolution."];
+    // Typewriter effect
+    const texts = ["Making Hardware Easy.", "100% Free Code.", "Join the Revolution.", "Build the Future."];
     let charI = 0, textI = 0;
+    
     function typeWriter() {
-        let curr = texts[textI];
-        document.getElementById('typing-text').textContent = "> " + curr.slice(0, charI++) + "|";
-        if(charI > curr.length) { charI = 0; textI = (textI + 1) % texts.length; setTimeout(typeWriter, 2000); }
-        else setTimeout(typeWriter, 100);
+        const element = document.getElementById('typing-text');
+        const current = texts[textI];
+        
+        if(charI < current.length) {
+            element.textContent = "> " + current.substring(0, charI + 1) + "|";
+            charI++;
+            setTimeout(typeWriter, 100);
+        } else {
+            setTimeout(() => {
+                element.textContent = "> " + current;
+                setTimeout(() => {
+                    charI = 0;
+                    textI = (textI + 1) % texts.length;
+                    typeWriter();
+                }, 2000);
+            }, 100);
+        }
     }
 
+    // Enhanced particle system
     function initParticles() {
-        const c = document.getElementById('bg-canvas'), ctx = c.getContext('2d');
-        c.width = window.innerWidth; c.height = window.innerHeight;
-        let p = Array.from({length:40}, () => ({x:Math.random()*c.width, y:Math.random()*c.height, vx:Math.random()-0.3, vy:Math.random()-0.3}));
-        function draw() {
-            ctx.clearRect(0,0,c.width,c.height); ctx.fillStyle = "#00d2ff22";
-            p.forEach(i => {
-                i.x += i.vx; i.y += i.vy;
-                if(i.x<0 || i.x>c.width) i.vx *= -1; if(i.y<0 || i.y>c.height) i.vy *= -1;
-                ctx.beginPath(); ctx.arc(i.x, i.y, 2, 0, Math.PI*2); ctx.fill();
+        const c = document.getElementById('bg-canvas');
+        const ctx = c.getContext('2d');
+        
+        function resize() {
+            c.width = window.innerWidth;
+            c.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        const particles = [];
+        const particleCount = 60;
+        
+        for(let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * c.width,
+                y: Math.random() * c.height,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                size: Math.random() * 2 + 1,
+                opacity: Math.random() * 0.5 + 0.2
             });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, c.width, c.height);
+            
+            // Draw connections
+            for(let i = 0; i < particles.length; i++) {
+                for(let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if(dist < 150) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(0, 210, 255, ${0.1 * (1 - dist/150)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            // Draw particles
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                
+                if(p.x < 0 || p.x > c.width) p.vx *= -1;
+                if(p.y < 0 || p.y > c.height) p.vy *= -1;
+                
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(0, 210, 255, ${p.opacity})`;
+                ctx.fill();
+            });
+            
             requestAnimationFrame(draw);
         }
         draw();
     }
+
+    // Close modal on outside click
+    document.getElementById('codeModal').addEventListener('click', function(e) {
+        if(e.target === this) closeModal();
+    });
+
+    // Enter key on login
+    document.getElementById('userName').addEventListener('keypress', function(e) {
+        if(e.key === 'Enter') handleLogin();
+    });
 </script>
 </body>
 </html>
